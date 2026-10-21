@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="352" height="584" viewBox="0 0 352 584" font-family="sans-serif">
+  <title>Komikan board</title>
+  <desc>38 nodes, 79 edges, starting position.</desc>
+  <rect width="352" height="584" fill="#fdfaf4"/>
+  <g stroke="#475569" stroke-width="3" stroke-linecap="round">
+    <line x1="48" y1="48" x2="112" y2="48"/>
+    <line x1="48" y1="48" x2="48" y2="112"/>
+    <line x1="112" y1="48" x2="176" y2="48"/>
+    <line x1="112" y1="48" x2="112" y2="112"/>
+    <line x1="176" y1="48" x2="240" y2="48"/>
+    <line x1="176" y1="48" x2="176" y2="112"/>
+    <line x1="240" y1="48" x2="304" y2="48"/>
+    <line x1="240" y1="48" x2="240" y2="112"/>
+    <line x1="304" y1="48" x2="304" y2="112"/>
+    <line x1="48" y1="112" x2="112" y2="112"/>
+    <line x1="48" y1="112" x2="112" y2="176"/>
+    <line x1="112" y1="112" x2="176" y2="112"/>
+    <line x1="112" y1="112" x2="112" y2="176"/>
+    <line x1="176" y1="112" x2="240" y2="112"/>
+    <line x1="176" y1="112" x2="176" y2="176"/>
+    <line x1="240" y1="112" x2="304" y2="112"/>
+    <line x1="240" y1="112" x2="240" y2="176"/>
+    <line x1="304" y1="112" x2="240" y2="176"/>
+    <line x1="112" y1="176" x2="176" y2="176"/>
+    <line x1="112" y1="176" x2="176" y2="240"/>
+    <line x1="176" y1="176" x2="240" y2="176"/>
+    <line x1="176" y1="176" x2="176" y2="240"/>
+    <line x1="240" y1="176" x2="176" y2="240"/>
+    <line x1="48" y1="240" x2="112" y2="240"/>
+    <line x1="48" y1="240" x2="48" y2="304"/>
+    <line x1="48" y1="240" x2="112" y2="304"/>
+    <line x1="112" y1="240" x2="176" y2="240"/>
+    <line x1="112" y1="240" x2="112" y2="304"/>
+    <line x1="176" y1="240" x2="240" y2="240"/>
+    <line x1="176" y1="240" x2="112" y2="304"/>
+    <line x1="176" y1="240" x2="176" y2="304"/>
+    <line x1="176" y1="240" x2="240" y2="304"/>
+    <line x1="240" y1="240" x2="304" y2="240"/>
+    <line x1="240" y1="240" x2="240" y2="304"/>
+    <line x1="304" y1="240" x2="240" y2="304"/>
+    <line x1="304" y1="240" x2="304" y2="304"/>
+    <line x1="48" y1="304" x2="112" y2="304"/>
+    <line x1="48" y1="304" x2="48" y2="368"/>
+    <line x1="112" y1="304" x2="176" y2="304"/>
+    <line x1="112" y1="304" x2="48" y2="368"/>
+    <line x1="112" y1="304" x2="112" y2="368"/>
+    <line x1="112" y1="304" x2="176" y2="368"/>
+    <line x1="176" y1="304" x2="240" y2="304"/>
+    <line x1="176" y1="304" x2="176" y2="368"/>
+    <line x1="240" y1="304" x2="304" y2="304"/>
+    <line x1="240" y1="304" x2="176" y2="368"/>
+    <line x1="240" y1="304" x2="240" y2="368"/>
+    <line x1="240" y1="304" x2="304" y2="368"/>
+    <line x1="304" y1="304" x2="304" y2="368"/>
+    <line x1="48" y1="368" x2="112" y2="368"/>
+    <line x1="48" y1="368" x2="48" y2="432"/>
+    <line x1="48" y1="368" x2="112" y2="432"/>
+    <line x1="112" y1="368" x2="176" y2="368"/>
+    <line x1="112" y1="368" x2="112" y2="432"/>
+    <line x1="176" y1="368" x2="240" y2="368"/>
+    <line x1="176" y1="368" x2="112" y2="432"/>
+    <line x1="176" y1="368" x2="176" y2="432"/>
+    <line x1="176" y1="368" x2="240" y2="432"/>
+    <line x1="240" y1="368" x2="304" y2="368"/>
+    <line x1="240" y1="368" x2="240" y2="432"/>
+    <line x1="304" y1="368" x2="240" y2="432"/>
+    <line x1="304" y1="368" x2="304" y2="432"/>
+    <line x1="48" y1="432" x2="112" y2="432"/>
+    <line x1="48" y1="432" x2="48" y2="496"/>
+    <line x1="112" y1="432" x2="176" y2="432"/>
+    <line x1="112" y1="432" x2="48" y2="496"/>
+    <line x1="112" y1="432" x2="112" y2="496"/>
+    <line x1="112" y1="432" x2="176" y2="496"/>
+    <line x1="176" y1="432" x2="240" y2="432"/>
+    <line x1="176" y1="432" x2="176" y2="496"/>
+    <line x1="240" y1="432" x2="304" y2="432"/>
+    <line x1="240" y1="432" x2="176" y2="496"/>
+    <line x1="240" y1="432" x2="240" y2="496"/>
+    <line x1="240" y1="432" x2="304" y2="496"/>
+    <line x1="304" y1="432" x2="304" y2="496"/>
+    <line x1="48" y1="496" x2="112" y2="496"/>
+    <line x1="112" y1="496" x2="176" y2="496"/>
+    <line x1="176" y1="496" x2="240" y2="496"/>
+    <line x1="240" y1="496" x2="304" y2="496"/>
+  </g>
+    <circle cx="48" cy="48" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="112" cy="48" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="176" cy="48" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="240" cy="48" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="304" cy="48" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="48" cy="112" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="112" cy="112" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="176" cy="112" r="17" fill="#f59e0b" stroke="#7c2d12" stroke-width="3"/>
+    <text x="176" y="118" font-size="16" font-weight="bold" text-anchor="middle" fill="#7c2d12">P</text>
+    <circle cx="240" cy="112" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="304" cy="112" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="112" cy="176" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="176" cy="176" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="240" cy="176" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="48" cy="240" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="112" cy="240" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="176" cy="240" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="240" cy="240" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="304" cy="240" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="48" cy="304" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="112" cy="304" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="176" cy="304" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="240" cy="304" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="304" cy="304" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="48" cy="368" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
+    <circle cx="112" cy="368" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="176" cy="368" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="240" cy="368" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="304" cy="368" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
+    <circle cx="48" cy="432" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
+    <circle cx="112" cy="432" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
+    <circle cx="176" cy="432" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
+    <circle cx="240" cy="432" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
+    <circle cx="304" cy="432" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
+    <circle cx="48" cy="496" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
+    <circle cx="112" cy="496" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
+    <circle cx="176" cy="496" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
+    <circle cx="240" cy="496" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
+    <circle cx="304" cy="496" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
+  <circle cx="48" cy="568" r="11" fill="#f59e0b" stroke="#7c2d12" stroke-width="2"/>
+  <text x="68" y="573" font-size="15" fill="#7c2d12">Pangui</text>
+  <circle cx="158" cy="568" r="9" fill="#b91c1c" stroke="#450a0a" stroke-width="2"/>
+  <text x="178" y="573" font-size="15" fill="#7c2d12">Trewa</text>
+  <text x="194" y="573" font-size="13" fill="#64748b">38 nodes, 79 edges</text>
+</svg>

@@ -156,8 +156,23 @@ The interpretation was checked programmatically before being written down:
 - Rendering the graph back to ASCII reproduces the sketch in `docs/board.md`
   exactly, including every connector row.
 
-`internal/board` must re-establish these properties with its own tests, so
-the checks survive independently of this document.
+`internal/board` re-establishes these properties with its own tests, so the
+checks survive independently of this document.
+
+## Implementation
+
+- `internal/board` holds the transcription. `board.Standard()` returns the
+  board and the starting position; `board.Validate(board, position)` checks
+  node uniqueness, symmetric adjacency, connectivity, and a legal placement.
+- `cmd/boarddump` prints the ASCII sketch and can write an SVG rendering:
+
+  ```
+  go run ./cmd/boarddump
+  go run ./cmd/boarddump -svg docs/board.svg
+  ```
+
+  `docs/board.svg` is the committed SVG rendering of the starting position.
+  Regenerate it whenever the layout changes.
 
 ## Caveats
 

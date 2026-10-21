@@ -11,6 +11,21 @@ coordinates, and the initial piece placement. A rendering of that data can be
 produced and eyeballed on the phone so the topology can be checked against the
 sketch it was derived from.
 
+**Status: completed on 2026-10-21.**
+
+`internal/board` holds the transcription of `features/komikan-board-layout.md`:
+38 nodes, 79 edges, node ids 0..37, the shared vertex at node 15, the Pangui
+on node 7, and the twelve Trewa on nodes 23 and 27..37.
+
+`cmd/boarddump` prints the ASCII sketch, an ASCII sketch with distinct piece
+glyphs (`P` for the Pangui, `T` for a Trewa), and writes an SVG rendering of
+the starting position to `docs/board.svg`:
+
+```
+go run ./cmd/boarddump
+go run ./cmd/boarddump -svg docs/board.svg
+```
+
 ## Scope
 
 - New package `internal/board` with the types from `docs/board.md`:
@@ -54,3 +69,23 @@ sketch it was derived from.
   its provenance are recorded in the closed dependency.
 - The renderer is deliberately part of this task: it is the cheapest way to
   confirm that the transcription matches the sketch it came from.
+
+## Completion notes
+
+- The package exposes `Standard()`, `Validate(board, position)`, the board
+  accessors (`Nodes`, `Neighbors`, `Coord`, `Edges`), and the position type
+  with `At`, `Set`, `Clone`, and `Counts`.
+- `New` rejects duplicate node ids, self loops, duplicate edges, and edges
+  that reference unknown nodes, so a malformed board cannot be constructed.
+- Tests cover the node and edge counts, id uniqueness, bidirectional edges,
+  connectivity, absence of isolated nodes, unit-length edges, the initial
+  position, exact reproduction of the `docs/board.md` sketch, that every edge
+  appears in the ASCII drawing, the piece-glyph drawing, and the SVG output.
+- `go build ./...`, `go vet ./...`, `gofmt -l .`, and `go test ./...` all pass
+  on this device (Go 1.27.2, android/arm64). `go test -race` was not run: it
+  is unavailable on this device.
+- `docs/board.svg` is committed as the rendered board.
+- The rules engine still needs to settle the capture geometry questions in
+  `issues/2026-10-21-komikan-capture-geometry-uncertainty.md`; the board data
+  supports both a unit-lattice capture check and any stricter pattern the
+  owner confirms.

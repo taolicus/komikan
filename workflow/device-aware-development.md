@@ -39,3 +39,13 @@ For cross-device handoffs, record:
 
 Preserve uncommitted work. Never assume changes are available on another device
 unless repository synchronisation has been verified.
+
+## Dependency feasibility
+
+Before planning work that depends on a third-party library, check that the
+library builds and runs on this device and cross-compiles for the deployment
+target. A library that works in one environment but not the other blocks the
+plan late and expensively.
+
+Record the verification result in the work item that depends on the library
+so the check is not repeated.

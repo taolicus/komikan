@@ -59,3 +59,35 @@ detection, all driven by a configurable `Ruleset`.
   answers change, the change should land in the `Ruleset` defaults or in the
   board data, not in scattered conditionals.
 - `features/` should record the confirmed rule set once the answers land.
+
+## Completion notes
+
+- **Status: completed on 2026-10-21.**
+- `internal/rules` imports `internal/board` and nothing else: no HTTP, no
+  embed, no web assets.
+- The engine holds the board and the ruleset; the state stays a plain
+  document that can be stored and sent to a browser. The suggested
+  signatures are kept: `LegalMoves(state, player)` and
+  `ApplyMove(state, move)`.
+- Every rule that varies between variants is a field of `Ruleset`
+  (`rules.DefaultRuleset()` holds the defaults proposed in the dependency
+  issues). The engine has no scattered conditionals for a variant.
+- The capture is a collinear, evenly spaced triple: the node beyond the
+  Trewa must be empty and the Trewa must be the exact midpoint. The
+  midpoint test covers every direction at once, so no pattern table is
+  needed.
+- `ApplyMove` never modifies the state it receives: it clones, applies, and
+  returns the new state. An illegal move returns an error and the original
+  state, byte for byte.
+- `Engine.Evaluate` applies the victory checks to a position that was set
+  up outside the engine, which is how a blocked puma is recognised.
+- Tests cover the cases in `docs/overview.md` §14: the initial position,
+  normal moves, occupied destinations, jumps that bend, jumps onto occupied
+  nodes, chains of captures, the capture threshold, the blocking win, the
+  unchanged state after an illegal move, no moves after the end of the
+  game, and every legal move being applicable. The triangle-occupation win
+  is recorded as not applicable: the canonical board has no triangle area,
+  so the rule stays off.
+- A random playout test runs 200 games to a terminal state with no panic,
+  no infinite loop and no illegal move.
+- The rules are written up in `features/komikan-rules.md`.

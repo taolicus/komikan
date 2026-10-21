@@ -5,11 +5,19 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/taolicus/komikan/internal/store"
 )
 
 func newTestServer(t *testing.T) *Server {
 	t.Helper()
-	s, err := New(Config{Version: "test"})
+	db, err := store.Open("")
+	if err != nil {
+		t.Fatalf("store.Open(): %v", err)
+	}
+	t.Cleanup(func() { db.Close() })
+
+	s, err := New(Config{Version: "test", Store: db})
 	if err != nil {
 		t.Fatalf("New(): %v", err)
 	}

@@ -9,5 +9,5 @@ import "embed"
 
 // Files contains the static assets served by the application.
 //
-//go:embed index.html favicon.svg
+//go:embed index.html rooms.html favicon.svg
 var Files embed.FS

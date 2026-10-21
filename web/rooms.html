@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Komikan · salas</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap">
+<style>
+  :root {
+    --bg: #0c0b09;
+    --ink: #f6efe0;
+    --muted: #8d8474;
+    --line: #2a2620;
+  }
+  html {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+  }
+  body {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: 100%;
+    padding: 2.5rem 1rem 3rem;
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main {
+    width: min(92vw, 560px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: auto 0;
+  }
+  h1 {
+    margin: 0;
+    font-family: "Cinzel", Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 9vw, 3rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .soon {
+    margin: 0.6rem 0 1.6rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0.35em;
+    text-indent: 0.35em;
+    text-transform: uppercase;
+  }
+  button {
+    font: inherit;
+    color: var(--ink);
+    background: #1d1a15;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.6rem 1.1rem;
+    cursor: pointer;
+  }
+  button:hover {
+    border-color: #6b6252;
+  }
+  button[disabled] {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 0 1.4rem;
+  }
+  .card {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.7rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .card a {
+    color: var(--ink);
+    text-decoration: none;
+    font-family: "Cinzel", Georgia, serif;
+    letter-spacing: 0.04em;
+  }
+  .card .meta {
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .board {
+    width: min(78vw, 340px);
+    margin-bottom: 1.4rem;
+  }
+  .board svg, .board img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  }
+  table.seats {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.2rem;
+    font-size: 0.92rem;
+  }
+  table.seats th, table.seats td {
+    text-align: left;
+    padding: 0.45rem 0.2rem;
+    border-bottom: 1px solid var(--line);
+  }
+  table.seats th {
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .note {
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0.4rem 0 0;
+  }
+  .status {
+    font-family: "Cinzel", Georgia, serif;
+    letter-spacing: 0.05em;
+    margin: 0 0 1.2rem;
+    color: #d8c9a6;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Komikan</h1>
+  <p class="soon" id="heading">Salas</p>
+
+  <section id="list-view" hidden>
+    <div class="actions">
+      <button id="create">Crear sala</button>
+    </div>
+    <div id="rooms"></div>
+    <p class="note" id="list-note"></p>
+  </section>
+
+  <section id="room-view" hidden>
+    <p class="status" id="room-status"></p>
+    <div class="board" id="room-board"></div>
+    <table class="seats">
+      <thead>
+        <tr><th>Puesto</th><th>Jugador</th><th>Rol</th></tr>
+      </thead>
+      <tbody id="room-seats"></tbody>
+    </table>
+    <div class="actions">
+      <button id="join">Unirse</button>
+      <button id="copy">Copiar enlace</button>
+      <button id="back">Volver</button>
+    </div>
+    <p class="note" id="room-note"></p>
+  </section>
+</main>
+<script>
+(function () {
+  "use strict";
+
+  const csrf = () => {
+    const match = document.cookie.match(/(?:^|;\s*)komikan_csrf=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : "";
+  };
+
+  const api = async (method, path) => {
+    const res = await fetch(path, {
+      method: method,
+      credentials: "same-origin",
+      headers: {"X-CSRF-Token": csrf(), "Content-Type": "application/json"},
+      body: method === "GET" ? undefined : "{}",
+    });
+    const text = await res.text();
+    let data = null;
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch (err) {
+      data = null;
+    }
+    return {status: res.status, data: data};
+  };
+
+  const el = (id) => document.getElementById(id);
+  const roomID = location.pathname.match(/^\/rooms\/([A-Za-z0-9_-]+)\/?$/);
+
+  const roleName = (role) => {
+    if (role === "PANGUI") return "Pangui 🐆";
+    if (role === "TREWA") return "Trewa 🐕";
+    return "—";
+  };
+
+  async function showList() {
+    el("heading").textContent = "Salas";
+    el("list-view").hidden = false;
+    el("room-view").hidden = true;
+
+    const res = await api("GET", "/api/rooms");
+    const rooms = (res.data && res.data.rooms) || [];
+    const box = el("rooms");
+    box.innerHTML = "";
+    for (const room of rooms) {
+      const card = document.createElement("div");
+      card.className = "card";
+      const link = document.createElement("a");
+      link.href = "/rooms/" + room.id;
+      link.textContent = room.id.slice(0, 8);
+      const meta = document.createElement("span");
+      meta.className = "meta";
+      meta.textContent = room.status + (room.you && room.you.role ? " · " + roleName(room.you.role) : "");
+      card.appendChild(link);
+      card.appendChild(meta);
+      box.appendChild(card);
+    }
+    el("list-note").textContent = rooms.length ? "" : "Todavía no tienes salas. Crea una y comparte el enlace.";
+  }
+
+  async function showRoom(id) {
+    el("heading").textContent = "Sala";
+    el("list-view").hidden = true;
+    el("room-view").hidden = false;
+
+    const res = await api("GET", "/api/rooms/" + encodeURIComponent(id));
+    if (res.status === 404) {
+      el("room-status").textContent = "La sala no existe.";
+      el("room-seats").innerHTML = "";
+      el("join").hidden = true;
+      return;
+    }
+    if (res.status === 403) {
+      el("room-status").textContent = "No estás en esta sala.";
+      el("room-seats").innerHTML = "";
+      el("join").hidden = false;
+      el("join").disabled = false;
+      return;
+    }
+    const room = res.data;
+    el("join").hidden = true;
+    el("room-status").textContent = room.status === "ACTIVE" ? "En juego" : "Esperando al segundo jugador";
+    el("room-note").textContent = room.you && room.you.role
+      ? "Juegas como " + roleName(room.you.role)
+      : "";
+
+    const body = el("room-seats");
+    body.innerHTML = "";
+    for (const seat of room.seats) {
+      const row = document.createElement("tr");
+      for (const value of [seat.seat, seat.playerId.slice(0, 8), roleName(seat.role)]) {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        row.appendChild(cell);
+      }
+      body.appendChild(row);
+    }
+
+    const version = room.game ? room.game.version : 0;
+    el("room-board").innerHTML = "";
+    const img = document.createElement("img");
+    img.alt = "Tablero de Komikan";
+    img.src = "/api/rooms/" + encodeURIComponent(id) + "/board?v=" + version;
+    el("room-board").appendChild(img);
+  }
+
+  el("create").addEventListener("click", async () => {
+    const res = await api("POST", "/api/rooms");
+    if (res.status === 201 && res.data) {
+      location.href = "/rooms/" + res.data.id;
+    }
+  });
+
+  el("join").addEventListener("click", async () => {
+    if (!roomID) return;
+    const res = await api("POST", "/api/rooms/" + encodeURIComponent(roomID[1]) + "/join");
+    if (res.status === 200) {
+      showRoom(roomID[1]);
+    } else {
+      el("room-note").textContent = res.data && res.data.error ? res.data.error : "No se pudo unirse.";
+    }
+  });
+
+  el("copy").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(location.href);
+      el("room-note").textContent = "Enlace copiado.";
+    } catch (err) {
+      el("room-note").textContent = location.href;
+    }
+  });
+
+  el("back").addEventListener("click", () => {
+    location.href = "/rooms/";
+  });
+
+  function refresh() {
+    if (roomID) {
+      showRoom(roomID[1]);
+    } else {
+      showList();
+    }
+  }
+
+  refresh();
+  setInterval(refresh, 3000);
+})();
+</script>
+</body>
+</html>

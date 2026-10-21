@@ -73,15 +73,19 @@ Under construction. What exists today:
   re-prove the topology from scratch;
 - an ASCII and an SVG renderer, used both by the coming-soon page and by the
   board dump command;
-- the coming-soon site itself, served by a single static Go binary.
+- the coming-soon site itself, served by a single static Go binary;
+- rooms and player identities: a browser gets an identity on its first
+  visit, creates a room, shares the link, and the second player joins it.
+  The roles are dealt at random when the second player arrives. The rooms
+  live at `/rooms/`, and the coming-soon page stays at `/`.
 
-Next: the rules engine, then rooms and asynchronous two-player play.
+Next: the rules engine, then the moves and the playable board.
 
 Some rules are still open questions and are tracked in `issues/`.
 
 ## Development
 
-Requires Go 1.27 or newer. No other dependencies.
+Requires Go 1.27 or newer.
 
 ```sh
 go test ./...                     # run the tests
@@ -101,9 +105,12 @@ sh deploy.sh
 
 | Path | What lives there |
 |---|---|
-| `cmd/server` | The web server and the coming-soon page |
+| `cmd/server` | The web server entry point |
 | `cmd/boarddump` | Prints or writes the board rendering |
 | `internal/board` | Board topology, positions, validation, rendering |
+| `internal/httpapi` | Routing, identities, rooms, JSON shapes |
+| `internal/store` | Persistence: players, rooms, seats, games, moves |
+| `web/` | The static pages, embedded in the binary |
 | `docs/` | Design documents: rules, application spec, original board sketch |
 | `features/` | Durable knowledge about the system as built |
 | `issues/`, `tasks/` | Open questions and planned work |
@@ -114,4 +121,5 @@ sh deploy.sh
 - [`docs/overview.md`](docs/overview.md) — rules and implementation spec
 - [`docs/spec.md`](docs/spec.md) — application and HTTP spec
 - [`features/komikan-board-layout.md`](features/komikan-board-layout.md) — the board, in full
+- [`features/komikan-web-api.md`](features/komikan-web-api.md) — identities, rooms, endpoints
 - [`features/tao-vps-go-service-deployment.md`](features/tao-vps-go-service-deployment.md) — how it is deployed

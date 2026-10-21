@@ -89,3 +89,11 @@ without rewriting the state blob on every move.
 Confirm or override. If you have no preference, reply "defaults" and the
 storage task proceeds with SQLite, a JSON state blob plus a version column, and
 a version check inside the write transaction.
+
+**Answered on 2026-10-21: the defaults were applied.** The storage task is
+done (`tasks/closed/2026-10-21-komikan-storage-layer.md`): SQLite through
+`modernc.org/sqlite`, one JSON blob per game with a `version` column, the
+version check inside the write transaction, the schema sketch above (with
+`seats` and `moves` as their own tables), and the database at
+`data/komikan.db` relative to the working directory, overridable with `-db`
+or `DB_PATH`.

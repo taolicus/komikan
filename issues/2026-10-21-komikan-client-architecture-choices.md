@@ -75,3 +75,21 @@ Confirm or override each default. If you have no strong preference, reply
 "defaults" and the tasks will proceed with them; changing them later is
 contained, but the identity choice in particular is cheaper to change before
 the rooms task exists.
+
+**Answered on 2026-10-21: the defaults were applied** while building the
+server skeleton and the rooms task.
+
+- (a) An `HttpOnly` cookie named `komikan_session` carries the identity; a
+  second, script-readable cookie `komikan_csrf` holds a token derived from
+  the session token, which the client echoes in the `X-CSRF-Token` header on
+  writes. Writes also have to come from our own `Origin`. A first contact
+  (no session yet) is accepted with a matching `Origin` alone.
+- (a) No build step: `web/` holds plain HTML, CSS, and JavaScript embedded
+  with `go:embed`.
+- (a) Polling every 3 seconds in the room page. SSE is still a future
+  extension.
+- (a) SVG. So far the server renders the board and sends it as
+  `image/svg+xml`; when the move UI arrives the client will draw from the
+  board data instead.
+- (a) Two pages: `/rooms/` and `/rooms/{roomID}`, with the coming-soon page
+  still at `/`.

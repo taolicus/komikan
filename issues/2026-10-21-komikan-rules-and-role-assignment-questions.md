@@ -40,6 +40,11 @@ The two seats need to map onto the two roles. Options:
 Proposed default: **(b)**, with the creator defaulting to Pangui. It costs
 little and removes a class of "wrong seat" frustration.
 
+**Answered on 2026-10-21: (c), roles are random on join.** The creator takes
+seat 1 without a role; when the second player joins, both seats are given a
+role at random. Implemented in `internal/store` (`JoinRoom`) and exposed by
+the room API.
+
 ## Part 3: scope questions the specs leave open
 
 1. **Reset / rematch inside a room.** `docs/overview.md` asks the UI to
@@ -64,3 +69,7 @@ little and removes a class of "wrong seat" frustration.
 Confirm or change the defaults in Part 1, pick (a)/(b)/(c) in Part 2, and
 confirm the Part 3 scope calls. The rules engine, room, and API tasks read
 these decisions.
+
+**Update 2026-10-21:** Part 2 is answered (c). Part 1 is still open: the
+rules engine task was deferred, so the defaults stand as proposals until
+they are confirmed. Part 3 remains open as well.

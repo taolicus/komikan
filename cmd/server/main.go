@@ -13,10 +13,12 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
 	"github.com/taolicus/komikan/internal/httpapi"
+	"github.com/taolicus/komikan/internal/store"
 )
 
 // version is set at build time with -ldflags "-X main.version=<rev>".
@@ -33,7 +35,7 @@ func run() error {
 	var (
 		showVersion = flag.Bool("version", false, "print the build version and exit")
 		addr        = flag.String("addr", envOr("ADDR", "127.0.0.1:18082"), "address to listen on")
-		dbPath      = flag.String("db", envOr("DB_PATH", ""), "database path (empty for now)")
+		dbPath      = flag.String("db", envOr("DB_PATH", "data/komikan.db"), "database path")
 	)
 	flag.Parse()
 
@@ -44,16 +46,25 @@ func run() error {
 
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo}))
 
-	api, err := httpapi.New(httpapi.Config{
-		Logger:  logger,
-		Version: version,
-	})
+	if dir := filepath.Dir(*dbPath); dir != "" && dir != "." {
+		if err := os.MkdirAll(dir, 0o750); err != nil {
+			return fmt.Errorf("create database directory: %w", err)
+		}
+	}
+	db, err := store.Open(*dbPath)
 	if err != nil {
 		return err
 	}
+	defer db.Close()
+	logger.Info("komikan: database ready", "path", *dbPath)
 
-	if *dbPath != "" {
-		logger.Info("database path configured", "path", *dbPath)
+	api, err := httpapi.New(httpapi.Config{
+		Logger:  logger,
+		Version: version,
+		Store:   db,
+	})
+	if err != nil {
+		return err
 	}
 
 	srv := &http.Server{

@@ -58,3 +58,31 @@ rejects stale writes.
 - Multi-process deployment is out of scope; the version check inside the
   transaction is what keeps a single-process server correct and would also
   survive a second process.
+
+## Completion notes
+
+- **Status: completed on 2026-10-21.**
+- `internal/store` exposes a `Store` interface and domain errors
+  (`ErrNotFound`, `ErrConflict`, `ErrInvalid`). The API layer sees no SQL.
+- The SQLite implementation uses `modernc.org/sqlite` (pure Go, no cgo), so
+  the same code builds on the phone and cross-compiles to `linux/amd64` with
+  `CGO_ENABLED=0`. The dependency is now in `go.mod`.
+- Schema (`internal/store/schema.sql`): `players`, `rooms`, `seats`, `games`,
+  `moves`; applied at startup and tracked with `PRAGMA user_version` (version
+  1). WAL mode, `busy_timeout=5000`, `foreign_keys=ON`, and a single
+  connection so SQLite never sees two writers.
+- The game state is a JSON blob next to a `version` column. `store.State` is
+  `json.RawMessage` for now, so the rules engine can replace the document
+  shape without touching the schema or the interface.
+- `ApplyMove` checks the expected version inside the transaction and writes
+  the state and the history row together, so a stale writer is rejected with
+  `ErrConflict` and leaves the stored state untouched.
+- `JoinRoom` takes the free seat, restores an existing seat when the same
+  player returns, refuses a third player with `ErrConflict`, and assigns the
+  two roles at random once the room is full.
+- `store.NewID()` returns a 128-bit random hex id, used for players and
+  rooms.
+- Verified on the device: the store tests pass against a temporary database
+  file; eight concurrent move applications for the same version produce
+  exactly one success; a closed and reopened store returns the same state and
+  history.

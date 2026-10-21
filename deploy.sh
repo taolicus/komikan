@@ -27,7 +27,8 @@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
 echo "==> copying to $HOST:$REMOTE_DIR"
 scp -q "$bin" "$HOST:$REMOTE_DIR/komikan.new"
 # Replace by rename so a running binary is never written in place.
-ssh "$HOST" "chmod 0755 '$REMOTE_DIR/komikan.new' && mv -f '$REMOTE_DIR/komikan.new' '$REMOTE_DIR/komikan' && systemctl restart $SERVICE"
+# The data directory holds the SQLite file and must belong to the service user.
+ssh "$HOST" "chmod 0755 '$REMOTE_DIR/komikan.new' && mv -f '$REMOTE_DIR/komikan.new' '$REMOTE_DIR/komikan' && install -d -o dev -g dev -m 0750 '$REMOTE_DIR/data' && systemctl restart $SERVICE"
 
 echo "==> checking $HEALTH_URL"
 curl -fsS --retry 10 --retry-delay 1 --retry-all-errors -o /dev/null "$HEALTH_URL"

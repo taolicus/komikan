@@ -108,8 +108,47 @@
     width: 100%;
     height: auto;
     display: block;
-    border-radius: 10px;
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  }
+  /* The board is drawn straight onto the page background: no panel of its
+     own, no shadow, and the colours are picked for the dark theme. */
+  .board .edges {
+    stroke: #6f6656;
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .board .node {
+    fill: #332e26;
+    stroke: #6f6656;
+    stroke-width: 2;
+  }
+  .board .pangui { fill: #14532d; }
+  .board .trewa { fill: #7f1d1d; }
+  .board .last {
+    fill: none;
+    stroke: #c9a227;
+    stroke-width: 3;
+    opacity: 0.7;
+  }
+  .board .target {
+    fill: none;
+    stroke: #3b82f6;
+    stroke-width: 4;
+  }
+  .board .target-capture {
+    fill: none;
+    stroke: #eab308;
+    stroke-width: 4;
+  }
+  .board .target-dot { fill: #3b82f6; }
+  .board .target-dot-capture { fill: #eab308; }
+  .board .selected {
+    fill: none;
+    stroke: #60a5fa;
+    stroke-width: 3;
+  }
+  .board .hit {
+    fill: transparent;
+    cursor: pointer;
   }
   .status {
     font-family: "Cinzel", Georgia, serif;
@@ -156,7 +195,7 @@
   }
   .legend .pangui::before { background: var(--green); }
   .legend .trewa::before { background: var(--red); }
-  .legend .yours::before { background: var(--gold); }
+  .legend .yours::before { background: #3b82f6; }
   table.seats {
     width: 100%;
     border-collapse: collapse;
@@ -307,13 +346,8 @@
       "font-family": "sans-serif",
     });
     svg.appendChild(element("title", {}, "Tablero de Komikan"));
-    svg.appendChild(element("rect", {width: width, height: height, fill: "#fdfaf4", rx: 10}));
 
-    const lines = element("g", {
-      stroke: "#475569",
-      "stroke-width": 3,
-      "stroke-linecap": "round",
-    });
+    const lines = element("g", {class: "edges"});
     for (const edge of board.edges) {
       const a = place(nodeByID(edge[0]));
       const b = place(nodeByID(edge[1]));
@@ -331,49 +365,41 @@
       const id = node.id;
 
       if (last && (last.from === id || last.to === id)) {
-        svg.appendChild(element("circle", {
-          cx: p.x, cy: p.y, r: 24, fill: "none", stroke: "#c9a227", "stroke-width": 3, opacity: 0.65,
-        }));
+        svg.appendChild(element("circle", {cx: p.x, cy: p.y, r: 24, class: "last"}));
       }
 
       if (piece === "PANGUI") {
-        svg.appendChild(element("circle", {cx: p.x, cy: p.y, r: 20, fill: "#14532d"}));
+        svg.appendChild(element("circle", {cx: p.x, cy: p.y, r: 20, class: "pangui"}));
         svg.appendChild(element("text", {
           x: p.x, y: p.y + 11, "font-size": 32, "text-anchor": "middle",
         }, "🐆"));
       } else if (piece === "TREWA") {
-        svg.appendChild(element("circle", {cx: p.x, cy: p.y, r: 16, fill: "#7f1d1d"}));
+        svg.appendChild(element("circle", {cx: p.x, cy: p.y, r: 16, class: "trewa"}));
         svg.appendChild(element("text", {
           x: p.x, y: p.y + 9, "font-size": 25, "text-anchor": "middle",
         }, "🐕"));
       } else {
-        svg.appendChild(element("circle", {
-          cx: p.x, cy: p.y, r: 6, fill: "#ffffff", stroke: "#94a3b8", "stroke-width": 2,
-        }));
+        svg.appendChild(element("circle", {cx: p.x, cy: p.y, r: 6, class: "node"}));
       }
 
       // The destination of a legal move, and the piece that may move.
       const destination = selectedMoves.find((move) => move.to === id);
       if (destination) {
+        const capture = destination.type === "CAPTURE";
         svg.appendChild(element("circle", {
-          cx: p.x, cy: p.y, r: 26, fill: "none",
-          stroke: destination.type === "CAPTURE" ? "#c9a227" : "#2563eb",
-          "stroke-width": 4,
+          cx: p.x, cy: p.y, r: 26,
+          class: capture ? "target-capture" : "target",
         }));
         svg.appendChild(element("circle", {
           cx: p.x, cy: p.y, r: 8,
-          fill: destination.type === "CAPTURE" ? "#c9a227" : "#2563eb",
+          class: capture ? "target-dot-capture" : "target-dot",
         }));
       }
       if (selected === id) {
-        svg.appendChild(element("circle", {
-          cx: p.x, cy: p.y, r: 28, fill: "none", stroke: "#2563eb", "stroke-width": 3,
-        }));
+        svg.appendChild(element("circle", {cx: p.x, cy: p.y, r: 28, class: "selected"}));
       }
 
-      const hit = element("circle", {
-        cx: p.x, cy: p.y, r: 26, fill: "transparent", style: "cursor:pointer",
-      });
+      const hit = element("circle", {cx: p.x, cy: p.y, r: 26, class: "hit"});
       hit.addEventListener("click", () => onNodeClick(id));
       svg.appendChild(hit);
     }

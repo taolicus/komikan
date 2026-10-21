@@ -179,6 +179,35 @@ checks survive independently of this document.
   returns an SVG element without an XML declaration, so it can be embedded in
   HTML; `cmd/boarddump` adds the declaration when writing a standalone file.
 
+## Rendering
+
+The site is dark, and the board is drawn **on the page background**: the SVG
+has no background rectangle, and the page gives it no panel, no border, and
+no shadow. The board sits on the page as if it were part of it.
+
+The colours are chosen for that dark background:
+
+| Part | Colour | Note |
+|---|---|---|
+| board lines | `#6f6656` | warm grey, light enough to read on `#0c0b09` |
+| empty node | `#332e26` fill, `#6f6656` stroke | a dim dot, not a white one |
+| Pangui disc | `#14532d` | deep green, no border |
+| Trewa disc | `#7f1d1d` | deep red, no border |
+| last move | `#c9a227` | gold ring |
+| legal destination | `#3b82f6` | blue ring and dot |
+| capture destination | `#eab308` | amber ring and dot |
+| selected piece | `#60a5fa` | light blue ring |
+
+There are two renderers and they use the same palette:
+
+- `internal/board.RenderSVG` writes the colours as inline attributes, because
+  its output has to stand on its own as an SVG file. It feeds the coming-soon
+  page, `GET /api/rooms/{roomID}/board`, and `cmd/boarddump`.
+- the game page draws the board in the browser from the board graph the API
+  sends, and takes its colours from CSS classes in `web/rooms.html`.
+
+There is no theme system: the dark colours are the colours.
+
 ## Caveats
 
 - This is one specific variant, chosen because it is documented and internally

@@ -2,8 +2,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="352" height="544" viewBox="0 0 352 544" font-family="sans-serif">
   <title>Komikan board</title>
   <desc>38 nodes, 79 edges, starting position.</desc>
-  <rect width="352" height="544" fill="#fdfaf4"/>
-  <g stroke="#475569" stroke-width="3" stroke-linecap="round">
+  <g stroke="#6f6656" stroke-width="3" stroke-linecap="round">
     <line x1="48" y1="48" x2="112" y2="48"/>
     <line x1="48" y1="48" x2="48" y2="112"/>
     <line x1="112" y1="48" x2="176" y2="48"/>
@@ -84,35 +83,35 @@
     <line x1="176" y1="496" x2="240" y2="496"/>
     <line x1="240" y1="496" x2="304" y2="496"/>
   </g>
-    <circle cx="48" cy="48" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="112" cy="48" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="176" cy="48" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="240" cy="48" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="304" cy="48" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="48" cy="112" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="112" cy="112" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="48" cy="48" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="112" cy="48" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="176" cy="48" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="240" cy="48" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="304" cy="48" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="48" cy="112" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="112" cy="112" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
     <circle cx="176" cy="112" r="20" fill="#14532d"/>
     <text x="176" y="123" font-size="32" text-anchor="middle">&#128006;</text>
-    <circle cx="240" cy="112" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="304" cy="112" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="112" cy="176" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="176" cy="176" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="240" cy="176" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="48" cy="240" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="112" cy="240" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="176" cy="240" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="240" cy="240" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="304" cy="240" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="48" cy="304" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="112" cy="304" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="176" cy="304" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="240" cy="304" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="304" cy="304" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="240" cy="112" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="304" cy="112" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="112" cy="176" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="176" cy="176" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="240" cy="176" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="48" cy="240" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="112" cy="240" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="176" cy="240" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="240" cy="240" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="304" cy="240" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="48" cy="304" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="112" cy="304" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="176" cy="304" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="240" cy="304" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="304" cy="304" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
     <circle cx="48" cy="368" r="16" fill="#7f1d1d"/>
     <text x="48" y="377" font-size="25" text-anchor="middle">&#128021;</text>
-    <circle cx="112" cy="368" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="176" cy="368" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="240" cy="368" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="112" cy="368" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="176" cy="368" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
+    <circle cx="240" cy="368" r="6" fill="#332e26" stroke="#6f6656" stroke-width="2"/>
     <circle cx="304" cy="368" r="16" fill="#7f1d1d"/>
     <text x="304" y="377" font-size="25" text-anchor="middle">&#128021;</text>
     <circle cx="48" cy="432" r="16" fill="#7f1d1d"/>

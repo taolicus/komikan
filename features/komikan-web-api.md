@@ -54,6 +54,9 @@ is identified, how rooms work, and what the endpoints answer.
 | POST | `/api/rooms/{roomID}/moves` | play a move, returns the new summary |
 | GET | `/api/rooms/{roomID}/board` | the board of the room as `image/svg+xml` |
 
+The board SVG is transparent and drawn for the dark page; see
+`features/komikan-board-layout.md` for the colours.
+
 Status codes: `400` malformed, `403` not a seat holder, out of turn, or a
 failed CSRF check, `404` unknown room, `409` full room, a stale version, a
 room that has not started, or a game that is over, `422` an illegal move.

@@ -107,10 +107,24 @@ func (b *Board) renderASCII(pos Position, glyph func(Piece) rune) (string, int) 
 	return strings.Join(c.lines(), "\n"), drawn
 }
 
+// The colours of the board drawing. The site is dark, so the board carries no
+// background of its own and the lines and dots are light enough to read
+// against the page. The piece colours stay as they are: deep green for the
+// Pangui, deep red for the Trewa, so the warm emoji read clearly on top.
+const (
+	svgEdge   = "#6f6656"
+	svgNode   = "#332e26"
+	svgPangui = "#14532d"
+	svgTrewa  = "#7f1d1d"
+)
+
 // RenderSVG draws the board as an SVG element. The result can be embedded in
 // an HTML document; add an XML declaration when writing it to a file as a
 // standalone document. The Pangui and the Trewa are drawn differently so the
 // position can be reviewed at a glance.
+//
+// The drawing is transparent: it is meant to sit on the page background
+// without a panel of its own.
 func (b *Board) RenderSVG(pos Position) string {
 	const (
 		cell   = 64
@@ -140,9 +154,8 @@ func (b *Board) RenderSVG(pos Position) string {
 	sb.WriteString(fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d" font-family="sans-serif">`+"\n", width, height, width, height))
 	sb.WriteString("  <title>Komikan board</title>\n")
 	sb.WriteString(fmt.Sprintf("  <desc>%d nodes, %d edges, starting position.</desc>\n", len(nodes), len(b.Edges())))
-	sb.WriteString(fmt.Sprintf(`  <rect width="%d" height="%d" fill="#fdfaf4"/>`+"\n", width, height))
 
-	sb.WriteString("  <g stroke=\"#475569\" stroke-width=\"3\" stroke-linecap=\"round\">\n")
+	sb.WriteString(fmt.Sprintf("  <g stroke=%q stroke-width=\"3\" stroke-linecap=\"round\">\n", svgEdge))
 	for _, e := range b.Edges() {
 		x1, y1 := px(e[0])
 		x2, y2 := px(e[1])
@@ -157,13 +170,13 @@ func (b *Board) RenderSVG(pos Position) string {
 		x, y := px(n.ID)
 		switch pos.At(n.ID) {
 		case PiecePangui:
-			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="20" fill="#14532d"/>`+"\n", x, y))
+			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="20" fill="%s"/>`+"\n", x, y, svgPangui))
 			sb.WriteString(fmt.Sprintf(`    <text x="%d" y="%d" font-size="32" text-anchor="middle">&#128006;</text>`+"\n", x, y+11))
 		case PieceTrewa:
-			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="16" fill="#7f1d1d"/>`+"\n", x, y))
+			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="16" fill="%s"/>`+"\n", x, y, svgTrewa))
 			sb.WriteString(fmt.Sprintf(`    <text x="%d" y="%d" font-size="25" text-anchor="middle">&#128021;</text>`+"\n", x, y+9))
 		default:
-			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>`+"\n", x, y))
+			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="6" fill="%s" stroke="%s" stroke-width="2"/>`+"\n", x, y, svgNode, svgEdge))
 		}
 	}
 

@@ -39,10 +39,11 @@ What is still to do:
 - the game page has no move history, no captured pieces shown on the board,
   and no way to see the opponent's last move other than the marked node;
 - the home page at `/` has a primary button that creates a game and a smaller
-  link to the list of rooms, but it does not list the player's own rooms, and
-  it still says "Próximamente" under the title. The user asked for the
-  coming-soon page to stay and for the two actions to be added to it, so it
-  stays as it is until they say otherwise.
+  link to the list of rooms, but it does not list the player's own rooms. The
+  "Próximamente" line under the title was dropped on the user's word on
+  2026-10-21, when the game became playable. The button ("Nueva partida") and
+  the link sit above the board, and a short description of the game sits
+  below it.
 
 ## Outcome
 

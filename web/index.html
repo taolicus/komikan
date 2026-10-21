@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Komikan</title>
-<meta name="description" content="Komikan, el juego de mesa mapuche. Próximamente.">
+<meta name="description" content="Komikan, el juego de mesa mapuche: un puma contra doce perros.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,17 +53,9 @@
     letter-spacing: 0.06em;
     line-height: 1.1;
   }
-  .soon {
-    margin: 0.9rem 0 2rem;
-    color: var(--muted);
-    font-size: 0.95rem;
-    font-weight: 400;
-    letter-spacing: 0.4em;
-    text-indent: 0.4em;
-    text-transform: uppercase;
-  }
   .board {
     width: min(78vw, 340px);
+    margin-top: 2rem;
   }
   /* The board is drawn on the page background: no panel, no shadow. */
   .board svg {
@@ -72,7 +64,7 @@
     display: block;
   }
   .actions {
-    margin-top: 1.8rem;
+    margin-top: 1.6rem;
   }
   .primary {
     font-family: "Cinzel", Georgia, "Times New Roman", serif;
@@ -99,20 +91,29 @@
     font-size: 0.85rem;
   }
   .rooms-link a {
-    color: #8d8474;
+    color: var(--muted);
     text-decoration: none;
     border-bottom: 1px solid #2a2620;
     padding-bottom: 1px;
   }
   .rooms-link a:hover {
-    color: #f6efe0;
+    color: var(--ink);
     border-bottom-color: #6b6252;
   }
   .note {
-    margin: 0.8rem 0 0;
-    min-height: 1.2em;
-    color: #8d8474;
+    margin: 0.6rem 0 0;
+    color: var(--muted);
     font-size: 0.85rem;
+  }
+  .note:empty {
+    display: none;
+  }
+  .blurb {
+    margin: 1.7rem 0 0;
+    max-width: 32rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.65;
   }
 </style>
 </head>
@@ -120,15 +121,19 @@
 <main>
   <div class="mascot" role="img" aria-label="Leopard">&#128006;</div>
   <h1>Komikan</h1>
-  <p class="soon">Pr&oacute;ximamente</p>
-  <div class="board">
-<!--BOARD-->
-  </div>
   <div class="actions">
-    <button id="create" class="primary" type="button">Crear partida</button>
+    <button id="create" class="primary" type="button">Nueva partida</button>
   </div>
   <p class="rooms-link"><a href="/rooms/">Ver las partidas</a></p>
   <p class="note" id="note"></p>
+  <div class="board">
+<!--BOARD-->
+  </div>
+  <p class="blurb">Komikan es un juego de mesa mapuche para dos: uno lleva al
+  Pangui, el puma, y el otro a los doce Trewa, los perros. Sobre un tablero de
+  38 puntos, el puma avanza un paso por turno y salta sobre los perros para
+  capturarlos. Gana al hacer seis capturas o al dejar a los perros sin jugada;
+  los perros ganan al acorralar al puma.</p>
 </main>
 <script>
 (function () {

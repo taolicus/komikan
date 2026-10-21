@@ -15,7 +15,7 @@ specific part.
 | database | `/home/dev/komikan/data/komikan.db`, with its `-wal` and `-shm` files |
 | backups | `/home/dev/komikan/backups/` |
 | public URL | `https://komikan.tequionet.org` (nginx proxies `/` to `127.0.0.1:18082`) |
-| pages | `/` is the coming-soon page, `/rooms/` is the rooms and the game |
+| pages | `/` is the home page, `/rooms/` is the rooms and the game |
 
 The unit sets `ADDR` and `DB_PATH` explicitly, and `UMask=0027` so the
 database and its write-ahead log are readable by the service user and by

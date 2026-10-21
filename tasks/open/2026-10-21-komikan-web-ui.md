@@ -24,6 +24,11 @@ What is already there, in `web/rooms.html`:
 - clicking a destination submits the move, and the board is refreshed by
   polling every two seconds.
 
+And in `web/index.html`, the home page:
+
+- a primary button that creates a game and takes the player straight to it;
+- a smaller link to the list of rooms under the button.
+
 What is still to do:
 
 - the phone layout was never looked at by a person; the widths, the touch
@@ -33,10 +38,11 @@ What is still to do:
   beyond the status line;
 - the game page has no move history, no captured pieces shown on the board,
   and no way to see the opponent's last move other than the marked node;
-- the coming-soon page is still served at `/`, and this task's scope says it
-  should be replaced by the home page listing the player's rooms. The user
-  asked for the coming-soon page to stay, so it stays until they say
-  otherwise.
+- the home page at `/` has a primary button that creates a game and a smaller
+  link to the list of rooms, but it does not list the player's own rooms, and
+  it still says "Próximamente" under the title. The user asked for the
+  coming-soon page to stay and for the two actions to be added to it, so it
+  stays as it is until they say otherwise.
 
 ## Outcome
 

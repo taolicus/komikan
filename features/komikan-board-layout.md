@@ -174,7 +174,7 @@ checks survive independently of this document.
   `docs/board.svg` is the committed SVG rendering of the starting position.
   Regenerate it whenever the layout changes.
 
-- The coming-soon page renders the board inline from this data at request
+- The home page renders the board inline from this data at request
   time, so the board on the site is always the real board. The SVG renderer
   returns an SVG element without an XML declaration, so it can be embedded in
   HTML; `cmd/boarddump` adds the declaration when writing a standalone file.
@@ -201,7 +201,7 @@ The colours are chosen for that dark background:
 There are two renderers and they use the same palette:
 
 - `internal/board.RenderSVG` writes the colours as inline attributes, because
-  its output has to stand on its own as an SVG file. It feeds the coming-soon
+  its output has to stand on its own as an SVG file. It feeds the home
   page, `GET /api/rooms/{roomID}/board`, and `cmd/boarddump`.
 - the game page draws the board in the browser from the board graph the API
   sends, and takes its colours from CSS classes in `web/rooms.html`.

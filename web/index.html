@@ -71,6 +71,49 @@
     height: auto;
     display: block;
   }
+  .actions {
+    margin-top: 1.8rem;
+  }
+  .primary {
+    font-family: "Cinzel", Georgia, "Times New Roman", serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #14110c;
+    background: #d8c9a6;
+    border: 1px solid #d8c9a6;
+    border-radius: 8px;
+    padding: 0.7rem 1.7rem;
+    cursor: pointer;
+  }
+  .primary:hover {
+    background: #e8dcbe;
+    border-color: #e8dcbe;
+  }
+  .primary[disabled] {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .rooms-link {
+    margin: 0.9rem 0 0;
+    font-size: 0.85rem;
+  }
+  .rooms-link a {
+    color: #8d8474;
+    text-decoration: none;
+    border-bottom: 1px solid #2a2620;
+    padding-bottom: 1px;
+  }
+  .rooms-link a:hover {
+    color: #f6efe0;
+    border-bottom-color: #6b6252;
+  }
+  .note {
+    margin: 0.8rem 0 0;
+    min-height: 1.2em;
+    color: #8d8474;
+    font-size: 0.85rem;
+  }
 </style>
 </head>
 <body>
@@ -81,6 +124,43 @@
   <div class="board">
 <!--BOARD-->
   </div>
+  <div class="actions">
+    <button id="create" class="primary" type="button">Crear partida</button>
+  </div>
+  <p class="rooms-link"><a href="/rooms/">Ver las partidas</a></p>
+  <p class="note" id="note"></p>
 </main>
+<script>
+(function () {
+  "use strict";
+
+  var button = document.getElementById("create");
+  var note = document.getElementById("note");
+
+  // The browser gets its identity on this call, so the new room belongs to
+  // whoever pressed the button.
+  button.addEventListener("click", function () {
+    button.disabled = true;
+    note.textContent = "";
+
+    fetch("/api/rooms", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {"Content-Type": "application/json"},
+      body: "{}",
+    }).then(function (res) {
+      if (res.status !== 201) {
+        throw new Error("the room was not created");
+      }
+      return res.json();
+    }).then(function (room) {
+      location.href = "/rooms/" + room.id;
+    }).catch(function () {
+      button.disabled = false;
+      note.textContent = "No se pudo crear la partida. Inténtalo de nuevo.";
+    });
+  });
+})();
+</script>
 </body>
 </html>

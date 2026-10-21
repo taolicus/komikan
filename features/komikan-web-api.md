@@ -42,7 +42,7 @@ is identified, how rooms work, and what the endpoints answer.
 
 | Method | Path | What it does |
 |--------|------|--------------|
-| GET | `/` | the coming-soon page |
+| GET | `/` | the home page: the board, and the action to start a game |
 | GET | `/rooms/` | the rooms page: list, create, join |
 | GET | `/rooms/{roomID}` | the same page, focused on one room |
 | GET | `/healthz` | `200 ok`, used by the deploy script |

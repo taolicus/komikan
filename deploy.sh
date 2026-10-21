@@ -11,16 +11,18 @@ set -eu
 HOST="${DEPLOY_HOST:-tao}"
 REMOTE_DIR="${DEPLOY_DIR:-/home/dev/komikan}"
 SERVICE="komikan"
-HEALTH_URL="${HEALTH_URL:-https://komikan.tequionet.org/}"
+HEALTH_URL="${HEALTH_URL:-https://komikan.tequionet.org/healthz}"
 
 cd "$(dirname "$0")"
 
 bin="$(mktemp)"
 trap 'rm -f "$bin"' EXIT
 
-echo "==> building for linux/amd64"
+rev="$(git rev-parse --short HEAD 2>/dev/null || echo dev)"
+
+echo "==> building for linux/amd64 ($rev)"
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-  go build -trimpath -ldflags="-s -w" -o "$bin" ./cmd/server
+  go build -trimpath -ldflags="-s -w -X main.version=$rev" -o "$bin" ./cmd/server
 
 echo "==> copying to $HOST:$REMOTE_DIR"
 scp -q "$bin" "$HOST:$REMOTE_DIR/komikan.new"

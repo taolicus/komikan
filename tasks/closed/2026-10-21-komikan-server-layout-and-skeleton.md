@@ -9,6 +9,8 @@ The project has a package layout that the rules, storage, API, and UI tasks
 can build on, and a server binary that starts, reports health, and shuts down
 cleanly.
 
+**Status: completed on 2026-10-21.**
+
 ## Scope
 
 - Reshape `cmd/server` into a thin entry point over internal packages:
@@ -46,3 +48,23 @@ cleanly.
 
 - This task is deliberately small and unblocks the parallel work of the
   storage and API tasks. It makes no behavioural change to the deployed site.
+
+## Completion notes
+
+- The package layout is now `cmd/server` (entry point), `internal/board`,
+  `internal/httpapi` (routing and handlers), and `web` (embedded static
+  assets). `internal/rules` and `internal/store` come with the tasks that need
+  them.
+- `web` is its own package with the single embed directive, so the UI task
+  adds assets to one directory instead of touching the server code.
+- `internal/httpapi.New(Config{Logger, Version})` builds the server and
+  renders the coming-soon page with the board injected at startup. The logger
+  is a dependency, not a global, so nothing in the server wiring is mutable
+  package state.
+- Configuration: `ADDR` (default `127.0.0.1:18082`), `DB_PATH` and a `-db`
+  flag (placeholder until the storage task lands), `-addr`, and `-version`.
+- `deploy.sh` stamps the short commit into the binary
+  (`-ldflags "-X main.version=$rev"`) and health-checks `/healthz`.
+- Verified on the device: `/healthz` 200, `/` 200 with the board inlined,
+  `/favicon.svg` 200, unknown paths 404; `SIGTERM` exits with code 0 in about
+  20 ms.

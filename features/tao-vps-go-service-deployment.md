@@ -21,6 +21,10 @@ how single-binary Go projects are deployed behind its nginx reverse proxy.
   atomically (`.new` + rename), restarts the service, and health-checks the
   public URL. Run with `sh deploy.sh` from the phone (shared storage is
   noexec).
+- Komikan's `deploy.sh` stamps the short commit into the binary
+  (`-ldflags "-s -w -X main.version=$rev"`, printed by `komikan -version`)
+  and health-checks `https://komikan.tequionet.org/healthz`, which the server
+  answers with `200 ok`.
 - systemd: `/etc/systemd/system/<name>.service`, `User=dev`,
   `WorkingDirectory=/home/dev/<name>`, `Restart=always`. Typical service
   environment: `ADDR=127.0.0.1:<port>` and/or `-addr` flag.

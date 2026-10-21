@@ -1,69 +1,99 @@
-// Komikan coming-soon page: a tiny HTTP server with an embedded HTML page.
+// Command server runs the Komikan web server.
 //
-// The page is rendered at request time from the embedded template and the
-// board data, so the board shown on the page is always the real board.
+// The binary is a thin entry point: it reads configuration, wires the
+// packages together, and owns the process lifecycle.
 package main
 
 import (
-	"embed"
-	"log"
+	"context"
+	"errors"
+	"flag"
+	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
-	"strings"
+	"os/signal"
+	"syscall"
+	"time"
 
-	"github.com/taolicus/komikan/internal/board"
+	"github.com/taolicus/komikan/internal/httpapi"
 )
 
-//go:embed index.html favicon.svg
-var content embed.FS
-
-// boardMarker is replaced in the template by the rendered board.
-const boardMarker = "<!--BOARD-->"
+// version is set at build time with -ldflags "-X main.version=<rev>".
+var version = "dev"
 
 func main() {
-	addr := os.Getenv("ADDR")
-	if addr == "" {
-		addr = "127.0.0.1:18082"
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, "komikan:", err)
+		os.Exit(1)
 	}
-
-	page, err := renderPage()
-	if err != nil {
-		log.Fatalf("komikan: %v", err)
-	}
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		if _, err := w.Write(page); err != nil {
-			log.Printf("komikan: %v", err)
-		}
-	})
-	mux.Handle("/favicon.svg", http.FileServer(http.FS(content)))
-
-	log.Printf("komikan: listening on %s", addr)
-	log.Fatal(http.ListenAndServe(addr, mux))
 }
 
-// renderPage fills the board marker in the template with the board rendered
-// in its starting position.
-func renderPage() ([]byte, error) {
-	tpl, err := content.ReadFile("index.html")
-	if err != nil {
-		return nil, err
+func run() error {
+	var (
+		showVersion = flag.Bool("version", false, "print the build version and exit")
+		addr        = flag.String("addr", envOr("ADDR", "127.0.0.1:18082"), "address to listen on")
+		dbPath      = flag.String("db", envOr("DB_PATH", ""), "database path (empty for now)")
+	)
+	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(version)
+		return nil
 	}
 
-	b, pos, err := board.Standard()
+	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo}))
+
+	api, err := httpapi.New(httpapi.Config{
+		Logger:  logger,
+		Version: version,
+	})
 	if err != nil {
-		return nil, err
-	}
-	if err := board.Validate(b, pos); err != nil {
-		return nil, err
+		return err
 	}
 
-	page := strings.Replace(string(tpl), boardMarker, b.RenderSVG(pos), 1)
-	return []byte(page), nil
+	if *dbPath != "" {
+		logger.Info("database path configured", "path", *dbPath)
+	}
+
+	srv := &http.Server{
+		Addr:              *addr,
+		Handler:           api.Handler(),
+		ReadHeaderTimeout: 10 * time.Second,
+	}
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	errc := make(chan error, 1)
+	go func() {
+		logger.Info("komikan: listening", "addr", *addr, "version", version)
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			errc <- err
+			return
+		}
+		errc <- nil
+	}()
+
+	select {
+	case err := <-errc:
+		return err
+	case <-ctx.Done():
+	}
+
+	logger.Info("komikan: shutting down")
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		return fmt.Errorf("shutdown: %w", err)
+	}
+	return nil
+}
+
+// envOr returns the environment variable or the fallback.
+func envOr(name, fallback string) string {
+	if v := os.Getenv(name); v != "" {
+		return v
+	}
+	return fallback
 }

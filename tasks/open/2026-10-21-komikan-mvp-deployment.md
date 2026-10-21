@@ -6,22 +6,34 @@
 
 ## Status
 
-Most of it is done and live. `https://komikan.tequionet.org` serves the
-coming-soon page at `/`, the rooms and the playable board under `/rooms/`,
-and the API under `/api/`. The database is at
-`/home/dev/komikan/data/komikan.db`, owned by `dev`, mode 0750 on the
-directory. `sh deploy.sh` builds for linux/amd64, copies atomically, restarts
-the service, and checks `/healthz`.
+Everything is done except one thing that needs a person: **two people on two
+devices playing a whole game**. The service is live, the state survives a
+restart, and the site is served over HTTPS with a valid certificate.
+
+What was checked, and how:
+
+- `sh deploy.sh` succeeds from the phone, and the health check passes. The
+  commit that is running is stamped into the binary and shows up in the
+  service log.
+- The database is at `/home/dev/komikan/data/komikan.db`, owned by `dev`.
+  The unit now sets `DB_PATH` and `UMask=0027`, so the database and its
+  write-ahead log are `0640`: readable by the service user and by nobody
+  else. The unit file is kept in the repository as `deploy/komikan.service`.
+- The game state survives `systemctl restart komikan`, checked through the
+  API: a room with a played move was still at the same version, with the
+  same position and the same seat, after the restart.
+- The service is `enabled`, so it starts again after a reboot.
+- The certificate is valid until 2027-01-17.
+- The runbook is `features/komikan-deployment-runbook.md`. The backup and
+  the restore were both run on the server and checked afterwards: the
+  restored database opens, and the room keeps its seats, its version and its
+  position.
 
 Still to do:
 
-- the runbook in `features/` (where the database lives, how to back it up,
-  how to restart, how to check health) — it does not exist yet;
-- prove the position survives `systemctl restart komikan` through the API,
-  not only in the store;
-- prove the service comes back after a reboot;
-- two people on two devices actually playing a whole game, which no person
-  has done yet.
+- two people, on two devices, opening `https://komikan.tequionet.org/rooms/`,
+  sharing a room link and playing a game to the end. Everything else can be
+  checked from here; that one needs two humans and two networks.
 
 ## Outcome
 

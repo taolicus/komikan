@@ -1,0 +1,28 @@
+# The Komikan service on the VPS.
+#
+# Copy to /etc/systemd/system/komikan.service, then:
+#   systemctl daemon-reload
+#   systemctl enable --now komikan
+#
+# The service runs as the unprivileged user "dev" and listens on the loopback
+# address only: nginx is the one that faces the internet.
+
+[Unit]
+Description=Komikan Game Server
+After=network.target
+
+[Service]
+Type=simple
+User=dev
+WorkingDirectory=/home/dev/komikan
+Environment=ADDR=127.0.0.1:18082
+Environment=DB_PATH=/home/dev/komikan/data/komikan.db
+# The database, its write-ahead log and its shared memory file belong to the
+# service user and to nobody else.
+UMask=0027
+ExecStart=/home/dev/komikan/komikan
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

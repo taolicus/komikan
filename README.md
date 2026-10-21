@@ -81,10 +81,13 @@ Under construction. What exists today:
 - the rules of the game (`internal/rules`): legal moves, captures, turns,
   and victory, all driven by a configurable ruleset;
 - moves over HTTP, decided by the server, and a board in the browser drawn
-  from the same graph the rules engine plays on.
+  from the same graph the rules engine plays on;
+- a test suite that plays whole games through the API, restarts the service
+  against the same database file, and proves that two moves submitted at the
+  same moment leave exactly one of them standing;
+- the service on the VPS, with a runbook for backups, restarts and health.
 
-Next: the remaining interface work, the integration tests, and the answer to
-the open rule questions.
+Next: the remaining interface work, and the answer to the open rule questions.
 
 Some rules are still open questions and are tracked in `issues/`.
 
@@ -127,4 +130,6 @@ sh deploy.sh
 - [`docs/spec.md`](docs/spec.md) — application and HTTP spec
 - [`features/komikan-board-layout.md`](features/komikan-board-layout.md) — the board, in full
 - [`features/komikan-web-api.md`](features/komikan-web-api.md) — identities, rooms, endpoints
+- [`features/komikan-rules.md`](features/komikan-rules.md) — the rules as they are implemented
+- [`features/komikan-deployment-runbook.md`](features/komikan-deployment-runbook.md) — the service on the VPS
 - [`features/tao-vps-go-service-deployment.md`](features/tao-vps-go-service-deployment.md) — how it is deployed

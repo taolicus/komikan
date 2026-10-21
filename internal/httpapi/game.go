@@ -271,7 +271,14 @@ func (s *Server) handleSubmitMove(w http.ResponseWriter, r *http.Request) {
 		s.writeError(w, errForbidden)
 		return
 	}
-	if room.Status != store.RoomActive {
+	switch room.Status {
+	case store.RoomFinished:
+		// The game is over: say so, rather than claiming the room never
+		// started.
+		s.writeError(w, errGameOver)
+		return
+	case store.RoomActive:
+	default:
 		s.writeError(w, errRoomNotActive)
 		return
 	}

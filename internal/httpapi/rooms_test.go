@@ -36,9 +36,20 @@ func newTestClient(t *testing.T, baseURL string) *testClient {
 func (c *testClient) do(method, path string, body io.Reader) (*http.Response, []byte) {
 	c.t.Helper()
 
+	resp, data, err := c.try(method, path, body)
+	if err != nil {
+		c.t.Fatalf("%s %s: %v", method, path, err)
+	}
+	return resp, data
+}
+
+// try performs a request and reports what went wrong instead of failing the
+// test. It is the form to use from a goroutine, where a failing test would
+// not stop the test cleanly.
+func (c *testClient) try(method, path string, body io.Reader) (*http.Response, []byte, error) {
 	req, err := http.NewRequest(method, c.baseURL+path, body)
 	if err != nil {
-		c.t.Fatalf("new request: %v", err)
+		return nil, nil, err
 	}
 	if method != http.MethodGet {
 		// Browsers send Origin on every write.
@@ -50,15 +61,22 @@ func (c *testClient) do(method, path string, body io.Reader) (*http.Response, []
 
 	resp, err := c.client.Do(req)
 	if err != nil {
-		c.t.Fatalf("%s %s: %v", method, path, err)
+		return nil, nil, err
 	}
 	defer resp.Body.Close()
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		c.t.Fatalf("read body: %v", err)
+		return nil, nil, err
 	}
-	return resp, data
+	return resp, data, nil
+}
+
+// pointAt moves the browser to another server, as a browser does when the
+// service comes back on a new address. The cookie jar follows the host, so
+// the identity is kept.
+func (c *testClient) pointAt(baseURL string) {
+	c.baseURL = baseURL
 }
 
 // csrfToken returns the CSRF token this browser holds.

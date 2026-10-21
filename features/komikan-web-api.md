@@ -65,6 +65,9 @@ Every error body carries a message and a machine-readable code:
 `MALFORMED`, `FORBIDDEN`, `NOT_YOUR_TURN`, `CSRF_FAILED`, `NOT_FOUND`,
 `STALE_VERSION`, `ROOM_NOT_ACTIVE`, `GAME_OVER`, `ILLEGAL_MOVE`.
 
+`ROOM_NOT_ACTIVE` means the room has not started yet: the second seat is
+still empty. `GAME_OVER` means the game is over and the room is finished.
+
 ## Playing a move
 
 `POST /api/rooms/{roomID}/moves` takes the node the piece stands on and the

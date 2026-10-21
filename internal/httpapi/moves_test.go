@@ -280,18 +280,16 @@ func TestAMalformedMoveIsRefused(t *testing.T) {
 	}
 }
 
-func TestAGameCanBePlayedToTheEnd(t *testing.T) {
-	srv := newTestAPI(t)
-	pair := newPlayingPair(t, srv)
+// playOut plays random legal moves until the game ends, and returns the
+// final state. The seed keeps the game the same from run to run.
+func playOut(t *testing.T, pair *playingPair) roomSummary {
+	t.Helper()
 	random := rand.New(rand.NewSource(20261021))
 
-	// Both players keep playing until the game ends. Every move is
-	// answered by the server, so this also proves that a whole game
-	// survives the round trip.
 	for step := 0; step < 400; step++ {
 		overview := pair.roomFor(t, pair.pangui)
 		if overview.Game.Status != "IN_PROGRESS" {
-			break
+			return overview
 		}
 		client := pair.pangui
 		if overview.Game.CurrentPlayer == string(rules.PlayerTrewa) {
@@ -310,8 +308,18 @@ func TestAGameCanBePlayedToTheEnd(t *testing.T) {
 			t.Fatalf("step %d: status = %d, want %d (body %s)", step, resp.StatusCode, http.StatusOK, respBody)
 		}
 	}
+	return pair.roomFor(t, pair.pangui)
+}
 
-	final := pair.roomFor(t, pair.pangui)
+func TestAGameCanBePlayedToTheEnd(t *testing.T) {
+	srv := newTestAPI(t)
+	pair := newPlayingPair(t, srv)
+
+	// Both players keep playing until the game ends. Every move is
+	// answered by the server, so this also proves that a whole game
+	// survives the round trip.
+	final := playOut(t, pair)
+
 	if final.Game.Status == "IN_PROGRESS" {
 		t.Fatal("the game did not end")
 	}

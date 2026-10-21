@@ -191,8 +191,17 @@ func TestRenderSVGIsWellFormed(t *testing.T) {
 	if got := strings.Count(svg, "<line "); got != len(b.Edges()) {
 		t.Errorf("SVG draws %d edges, board has %d", got, len(b.Edges()))
 	}
-	if got := strings.Count(svg, "<circle "); got != 38+2 {
-		t.Errorf("SVG draws %d circles, want %d nodes plus 2 legend entries", got, 38+2)
+	if got := strings.Count(svg, "<circle "); got != 38 {
+		t.Errorf("SVG draws %d circles, want one per node", got)
+	}
+	if got := strings.Count(svg, "&#128006;"); got != 1 {
+		t.Errorf("SVG draws %d leopard emoji, want 1", got)
+	}
+	if got := strings.Count(svg, "&#128021;"); got != 12 {
+		t.Errorf("SVG draws %d dog emoji, want 12", got)
+	}
+	if strings.Contains(svg, "legend") || strings.Contains(svg, "Trewa</text>") {
+		t.Error("SVG still carries a legend row")
 	}
 
 	// The same markup, with an XML declaration, is a valid standalone

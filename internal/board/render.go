@@ -129,7 +129,7 @@ func (b *Board) RenderSVG(pos Position) string {
 	}
 
 	width := 2*margin + maxX*cell
-	height := 2*margin + maxY*cell + 40
+	height := 2*margin + maxY*cell
 
 	px := func(id NodeID) (int, int) {
 		n, _ := b.Node(id)
@@ -150,25 +150,21 @@ func (b *Board) RenderSVG(pos Position) string {
 	}
 	sb.WriteString("  </g>\n")
 
+	// The pieces are drawn as emoji on a coloured disc: the Pangui is a
+	// leopard, the Trewa are dogs.
 	for _, n := range nodes {
 		x, y := px(n.ID)
 		switch pos.At(n.ID) {
 		case PiecePangui:
-			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="17" fill="#f59e0b" stroke="#7c2d12" stroke-width="3"/>`+"\n", x, y))
-			sb.WriteString(fmt.Sprintf(`    <text x="%d" y="%d" font-size="16" font-weight="bold" text-anchor="middle" fill="#7c2d12">P</text>`+"\n", x, y+6))
+			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="16" fill="#f59e0b" stroke="#7c2d12" stroke-width="3"/>`+"\n", x, y))
+			sb.WriteString(fmt.Sprintf(`    <text x="%d" y="%d" font-size="26" text-anchor="middle">&#128006;</text>`+"\n", x, y+9))
 		case PieceTrewa:
 			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>`+"\n", x, y))
+			sb.WriteString(fmt.Sprintf(`    <text x="%d" y="%d" font-size="20" text-anchor="middle">&#128021;</text>`+"\n", x, y+7))
 		default:
 			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>`+"\n", x, y))
 		}
 	}
-
-	legendY := height - 16
-	sb.WriteString(fmt.Sprintf(`  <circle cx="%d" cy="%d" r="11" fill="#f59e0b" stroke="#7c2d12" stroke-width="2"/>`+"\n", margin, legendY))
-	sb.WriteString(fmt.Sprintf(`  <text x="%d" y="%d" font-size="15" fill="#7c2d12">Pangui</text>`+"\n", margin+20, legendY+5))
-	sb.WriteString(fmt.Sprintf(`  <circle cx="%d" cy="%d" r="9" fill="#b91c1c" stroke="#450a0a" stroke-width="2"/>`+"\n", margin+110, legendY))
-	sb.WriteString(fmt.Sprintf(`  <text x="%d" y="%d" font-size="15" fill="#7c2d12">Trewa</text>`+"\n", margin+130, legendY+5))
-	sb.WriteString(fmt.Sprintf(`  <text x="%d" y="%d" font-size="13" fill="#64748b">%d nodes, %d edges</text>`+"\n", width-margin-110, legendY+5, len(nodes), len(b.Edges())))
 
 	sb.WriteString("</svg>\n")
 	return sb.String()

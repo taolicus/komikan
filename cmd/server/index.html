@@ -15,17 +15,18 @@
     --ink: #f6efe0;
     --muted: #8d8474;
   }
-  html, body {
+  html {
     height: 100%;
     margin: 0;
     background: var(--bg);
   }
   body {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     box-sizing: border-box;
-    padding: 2.5rem 1rem;
+    min-height: 100%;
+    padding: 3rem 1rem 3rem;
     color: var(--ink);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -35,10 +36,13 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    /* Auto margins centre the page without clipping the top when the
+       content is taller than the viewport. */
+    margin: auto 0;
   }
   .mascot {
     font-size: 4.5rem;
-    line-height: 1;
+    line-height: 1.1;
     margin-bottom: 1rem;
   }
   h1 {
@@ -59,7 +63,7 @@
     text-transform: uppercase;
   }
   .board {
-    width: min(84vw, 380px);
+    width: min(78vw, 340px);
   }
   .board svg {
     width: 100%;
@@ -71,7 +75,7 @@
 </head>
 <body>
 <main>
-  <div class="mascot" role="img" aria-label="Leopard">&#128038;</div>
+  <div class="mascot" role="img" aria-label="Leopard">&#128006;</div>
   <h1>Komikan</h1>
   <p class="soon">Pr&oacute;ximamente</p>
   <div class="board">

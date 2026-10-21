@@ -91,8 +91,8 @@
     <circle cx="304" cy="48" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
     <circle cx="48" cy="112" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
     <circle cx="112" cy="112" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="176" cy="112" r="16" fill="#f59e0b" stroke="#7c2d12" stroke-width="3"/>
-    <text x="176" y="121" font-size="26" text-anchor="middle">&#128006;</text>
+    <circle cx="176" cy="112" r="20" fill="#14532d" stroke="#4ade80" stroke-width="3"/>
+    <text x="176" y="123" font-size="32" text-anchor="middle">&#128006;</text>
     <circle cx="240" cy="112" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
     <circle cx="304" cy="112" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
     <circle cx="112" cy="176" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
@@ -108,31 +108,31 @@
     <circle cx="176" cy="304" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
     <circle cx="240" cy="304" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
     <circle cx="304" cy="304" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="48" cy="368" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
-    <text x="48" y="375" font-size="20" text-anchor="middle">&#128021;</text>
+    <circle cx="48" cy="368" r="16" fill="#7f1d1d" stroke="#f87171" stroke-width="3"/>
+    <text x="48" y="377" font-size="25" text-anchor="middle">&#128021;</text>
     <circle cx="112" cy="368" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
     <circle cx="176" cy="368" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
     <circle cx="240" cy="368" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <circle cx="304" cy="368" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
-    <text x="304" y="375" font-size="20" text-anchor="middle">&#128021;</text>
-    <circle cx="48" cy="432" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
-    <text x="48" y="439" font-size="20" text-anchor="middle">&#128021;</text>
-    <circle cx="112" cy="432" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
-    <text x="112" y="439" font-size="20" text-anchor="middle">&#128021;</text>
-    <circle cx="176" cy="432" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
-    <text x="176" y="439" font-size="20" text-anchor="middle">&#128021;</text>
-    <circle cx="240" cy="432" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
-    <text x="240" y="439" font-size="20" text-anchor="middle">&#128021;</text>
-    <circle cx="304" cy="432" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
-    <text x="304" y="439" font-size="20" text-anchor="middle">&#128021;</text>
-    <circle cx="48" cy="496" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
-    <text x="48" y="503" font-size="20" text-anchor="middle">&#128021;</text>
-    <circle cx="112" cy="496" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
-    <text x="112" y="503" font-size="20" text-anchor="middle">&#128021;</text>
-    <circle cx="176" cy="496" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
-    <text x="176" y="503" font-size="20" text-anchor="middle">&#128021;</text>
-    <circle cx="240" cy="496" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
-    <text x="240" y="503" font-size="20" text-anchor="middle">&#128021;</text>
-    <circle cx="304" cy="496" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>
-    <text x="304" y="503" font-size="20" text-anchor="middle">&#128021;</text>
+    <circle cx="304" cy="368" r="16" fill="#7f1d1d" stroke="#f87171" stroke-width="3"/>
+    <text x="304" y="377" font-size="25" text-anchor="middle">&#128021;</text>
+    <circle cx="48" cy="432" r="16" fill="#7f1d1d" stroke="#f87171" stroke-width="3"/>
+    <text x="48" y="441" font-size="25" text-anchor="middle">&#128021;</text>
+    <circle cx="112" cy="432" r="16" fill="#7f1d1d" stroke="#f87171" stroke-width="3"/>
+    <text x="112" y="441" font-size="25" text-anchor="middle">&#128021;</text>
+    <circle cx="176" cy="432" r="16" fill="#7f1d1d" stroke="#f87171" stroke-width="3"/>
+    <text x="176" y="441" font-size="25" text-anchor="middle">&#128021;</text>
+    <circle cx="240" cy="432" r="16" fill="#7f1d1d" stroke="#f87171" stroke-width="3"/>
+    <text x="240" y="441" font-size="25" text-anchor="middle">&#128021;</text>
+    <circle cx="304" cy="432" r="16" fill="#7f1d1d" stroke="#f87171" stroke-width="3"/>
+    <text x="304" y="441" font-size="25" text-anchor="middle">&#128021;</text>
+    <circle cx="48" cy="496" r="16" fill="#7f1d1d" stroke="#f87171" stroke-width="3"/>
+    <text x="48" y="505" font-size="25" text-anchor="middle">&#128021;</text>
+    <circle cx="112" cy="496" r="16" fill="#7f1d1d" stroke="#f87171" stroke-width="3"/>
+    <text x="112" y="505" font-size="25" text-anchor="middle">&#128021;</text>
+    <circle cx="176" cy="496" r="16" fill="#7f1d1d" stroke="#f87171" stroke-width="3"/>
+    <text x="176" y="505" font-size="25" text-anchor="middle">&#128021;</text>
+    <circle cx="240" cy="496" r="16" fill="#7f1d1d" stroke="#f87171" stroke-width="3"/>
+    <text x="240" y="505" font-size="25" text-anchor="middle">&#128021;</text>
+    <circle cx="304" cy="496" r="16" fill="#7f1d1d" stroke="#f87171" stroke-width="3"/>
+    <text x="304" y="505" font-size="25" text-anchor="middle">&#128021;</text>
 </svg>

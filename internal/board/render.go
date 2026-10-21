@@ -150,17 +150,18 @@ func (b *Board) RenderSVG(pos Position) string {
 	}
 	sb.WriteString("  </g>\n")
 
-	// The pieces are drawn as emoji on a coloured disc: the Pangui is a
-	// leopard, the Trewa are dogs.
+	// The pieces are drawn as emoji on a dark disc: the Pangui is a leopard
+	// on deep green, the Trewa are dogs on deep red. The discs are dark so
+	// the warm emoji colours read clearly against them.
 	for _, n := range nodes {
 		x, y := px(n.ID)
 		switch pos.At(n.ID) {
 		case PiecePangui:
-			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="16" fill="#f59e0b" stroke="#7c2d12" stroke-width="3"/>`+"\n", x, y))
-			sb.WriteString(fmt.Sprintf(`    <text x="%d" y="%d" font-size="26" text-anchor="middle">&#128006;</text>`+"\n", x, y+9))
+			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="20" fill="#14532d" stroke="#4ade80" stroke-width="3"/>`+"\n", x, y))
+			sb.WriteString(fmt.Sprintf(`    <text x="%d" y="%d" font-size="32" text-anchor="middle">&#128006;</text>`+"\n", x, y+11))
 		case PieceTrewa:
-			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="13" fill="#b91c1c" stroke="#450a0a" stroke-width="3"/>`+"\n", x, y))
-			sb.WriteString(fmt.Sprintf(`    <text x="%d" y="%d" font-size="20" text-anchor="middle">&#128021;</text>`+"\n", x, y+7))
+			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="16" fill="#7f1d1d" stroke="#f87171" stroke-width="3"/>`+"\n", x, y))
+			sb.WriteString(fmt.Sprintf(`    <text x="%d" y="%d" font-size="25" text-anchor="middle">&#128021;</text>`+"\n", x, y+9))
 		default:
 			sb.WriteString(fmt.Sprintf(`    <circle cx="%d" cy="%d" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>`+"\n", x, y))
 		}

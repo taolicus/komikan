@@ -107,8 +107,10 @@ func (b *Board) renderASCII(pos Position, glyph func(Piece) rune) (string, int) 
 	return strings.Join(c.lines(), "\n"), drawn
 }
 
-// RenderSVG draws the board as a standalone SVG document. The Pangui and the
-// Trewa are drawn differently so the position can be reviewed at a glance.
+// RenderSVG draws the board as an SVG element. The result can be embedded in
+// an HTML document; add an XML declaration when writing it to a file as a
+// standalone document. The Pangui and the Trewa are drawn differently so the
+// position can be reviewed at a glance.
 func (b *Board) RenderSVG(pos Position) string {
 	const (
 		cell   = 64
@@ -135,7 +137,6 @@ func (b *Board) RenderSVG(pos Position) string {
 	}
 
 	var sb strings.Builder
-	sb.WriteString(`<?xml version="1.0" encoding="UTF-8"?>` + "\n")
 	sb.WriteString(fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d" font-family="sans-serif">`+"\n", width, height, width, height))
 	sb.WriteString("  <title>Komikan board</title>\n")
 	sb.WriteString(fmt.Sprintf("  <desc>%d nodes, %d edges, starting position.</desc>\n", len(nodes), len(b.Edges())))

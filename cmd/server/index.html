@@ -4,25 +4,79 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Komikan</title>
+<meta name="description" content="Komikan, el juego de mesa mapuche. Próximamente.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap">
 <style>
+  :root {
+    --bg: #0c0b09;
+    --ink: #f6efe0;
+    --muted: #8d8474;
+  }
   html, body {
     height: 100%;
     margin: 0;
-    background: #000;
+    background: var(--bg);
   }
   body {
     display: flex;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
+    padding: 2.5rem 1rem;
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .mascot {
+    font-size: 4.5rem;
+    line-height: 1;
+    margin-bottom: 1rem;
   }
   h1 {
     margin: 0;
-    color: #fff;
-    font-family: sans-serif;
+    font-family: "Cinzel", Georgia, "Times New Roman", serif;
+    font-size: clamp(2.75rem, 14vw, 4.5rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.1;
+  }
+  .soon {
+    margin: 0.9rem 0 2rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 400;
+    letter-spacing: 0.4em;
+    text-indent: 0.4em;
+    text-transform: uppercase;
+  }
+  .board {
+    width: min(84vw, 380px);
+  }
+  .board svg {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
   }
 </style>
 </head>
 <body>
-<h1>Pr&oacute;ximamente...</h1>
+<main>
+  <div class="mascot" role="img" aria-label="Leopard">&#128038;</div>
+  <h1>Komikan</h1>
+  <p class="soon">Pr&oacute;ximamente</p>
+  <div class="board">
+<!--BOARD-->
+  </div>
+</main>
 </body>
 </html>

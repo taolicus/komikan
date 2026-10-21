@@ -1,6 +1,7 @@
 package board
 
 import (
+	"encoding/xml"
 	"strings"
 	"testing"
 )
@@ -181,8 +182,8 @@ func TestRenderASCIIIsEmptyForEmptyPosition(t *testing.T) {
 func TestRenderSVGIsWellFormed(t *testing.T) {
 	b, pos := standard(t)
 	svg := b.RenderSVG(pos)
-	if !strings.HasPrefix(svg, `<?xml version="1.0" encoding="UTF-8"?>`) {
-		t.Error("SVG is missing its XML declaration")
+	if !strings.HasPrefix(svg, "<svg ") {
+		t.Error("SVG does not start with its root element")
 	}
 	if !strings.Contains(svg, "<svg") || !strings.Contains(svg, "</svg>") {
 		t.Error("SVG is missing its root element")
@@ -192,6 +193,13 @@ func TestRenderSVGIsWellFormed(t *testing.T) {
 	}
 	if got := strings.Count(svg, "<circle "); got != 38+2 {
 		t.Errorf("SVG draws %d circles, want %d nodes plus 2 legend entries", got, 38+2)
+	}
+
+	// The same markup, with an XML declaration, is a valid standalone
+	// document. This is what boarddump writes to disk.
+	var doc struct{}
+	if err := xml.Unmarshal([]byte(`<?xml version="1.0" encoding="UTF-8"?>`+"\n"+svg), &doc); err != nil {
+		t.Errorf("SVG is not valid XML: %v", err)
 	}
 }
 

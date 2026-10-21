@@ -35,7 +35,10 @@ func main() {
 	fmt.Printf("\n%s\n", b.RenderASCIIWithPieces(pos))
 
 	if *svgPath != "" {
-		if err := os.WriteFile(*svgPath, []byte(b.RenderSVG(pos)), 0o644); err != nil {
+		// A standalone SVG file needs an XML declaration; inline in HTML it
+		// does not.
+		doc := `<?xml version="1.0" encoding="UTF-8"?>` + "\n" + b.RenderSVG(pos)
+		if err := os.WriteFile(*svgPath, []byte(doc), 0o644); err != nil {
 			fmt.Fprintf(os.Stderr, "boarddump: %v\n", err)
 			os.Exit(1)
 		}

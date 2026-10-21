@@ -2,8 +2,41 @@
 
 - Date: 2026-10-21
 - Area: game-rules
+- Resolved: 2026-10-21
 
-## Problem
+## Resolution
+
+Settled by the project owner on 2026-10-21:
+
+- **Board:** the 38-point layout drawn in `docs/board.md` — a 5x5 Alquerque
+  square (25 points) plus a 13-point triangular region above it, the
+  triangle's bottom vertex shared with the square's top row.
+- **Triangle lines:** the adjacency implied by the sketch, as written out
+  exactly in `features/komikan-board-layout.md`.
+- **Pangi start:** the middle of the second row, node 7.
+
+The pinned definition — node table, full 79-edge list, initial placement, and
+the checks it was verified against — now lives in
+`features/komikan-board-layout.md`, which is the authoritative version of
+`docs/board.md`.
+
+Research that informed the decision:
+
+- Wikipedia (en and es) and Board and Pieces confirm Komikan is played on an
+  expanded Alquerque board with a triangular section, and that several
+  triangular variants exist, so the project pins one board rather than
+  claiming a canonical one.
+- Adrian Cheuquepan's account (cited by Wikipedia) confirms the rules in
+  `docs/overview.md` and places the Pangi in the triangle and the Trewa in
+  the square, which the adopted layout matches.
+- Chilean sources describe a board of 38 puntos; the adopted layout has
+  exactly 38 nodes.
+
+The interpretation was verified before being written down: 38 nodes, 79
+bidirectional edges, connected, no isolated nodes, every edge one unit long,
+and a render that reproduces the sketch in `docs/board.md` exactly.
+
+## Problem as found
 
 `docs/board.md` defines the board as an ASCII sketch. The sketch is not precise
 enough to derive a node/edge list without interpretation, and the shape it
@@ -29,7 +62,11 @@ Reading `docs/board.md` literally, the sketch has eight rows of nodes:
 That is 38 nodes and 13 occupied starting nodes (1 Pangui + 12 Trewa), so the
 piece counts are internally consistent.
 
-## Where it is ambiguous or probably wrong
+## Where it looked ambiguous (as first written)
+
+Preserved as written. Point 1 was the weakest part of this analysis: the
+40-point hypothesis rested on an unverified recollection and was weakened once
+Chilean sources describing a board of *38 puntos* turned up.
 
 1. **The top region is not a triangle.** Rows of 5, 5, and 3 nodes do not form
    a triangle. The traditional board is usually drawn as a triangle of 1, 2,
@@ -53,9 +90,7 @@ piece counts are internally consistent.
    unambiguous enough to adopt as is, and matches the traditional drawing
    style.
 
-## What I need from you
-
-Pick one:
+## What I asked (answered as option b)
 
 - **(a) Supply a reference.** A photo, scan, or link to a board you trust
   (community or published account). I transcribe it into the node/edge list
@@ -66,11 +101,8 @@ Pick one:
   its base row with the 5x5 square) and I implement that, treating the
   sketch as a drafting error.
 
-## Proposed default if you have no preference
-
-Option (c), with the sketch's piece placement adapted: Pangui on the triangle
-apex, Trewa on the bottom two rows of the square plus the two outer nodes of
-the row above them (12 nodes, which matches the sketch's occupied count).
+**Answered as (b)**, with the sketch's reading as the source of the exact
+adjacency.
 
 ## Interim handling
 
@@ -82,5 +114,6 @@ an engine rewrite.
 
 ## Next step
 
-Answer (a), (b), or (c). Until then, the board data task records its
-interpretation explicitly so it can be corrected in one place.
+Implemented as a transcription of `features/komikan-board-layout.md` by
+`tasks/open/2026-10-21-komikan-board-data-and-renderer.md`, whose renderer
+must reproduce the sketch in `docs/board.md`.

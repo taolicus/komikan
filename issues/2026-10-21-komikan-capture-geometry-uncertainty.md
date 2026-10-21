@@ -11,6 +11,14 @@ stored as a graph, and the doc explicitly warns that two consecutive edges do
 not necessarily form a legal jump. The rules engine needs a concrete,
 implementable definition, plus answers to a few related gaps.
 
+**Update 2026-10-21:** the board is now settled
+(`features/komikan-board-layout.md`) and every edge spans exactly one unit
+horizontally, vertically, or diagonally. The board is a unit lattice, so
+question 1 below is no longer a judgement call between a geometry-derived rule
+and an explicit pattern list: a capture is exactly a pair of edges forming a
+collinear, evenly spaced triple of nodes. No separate capture-pattern table is
+needed. The remaining questions still stand.
+
 ## Open questions
 
 1. **How is "straight line" determined?**

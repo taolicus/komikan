@@ -18,7 +18,10 @@ in git, so it is not even in the repository history yet.
    creator/joiner flow but never says which seat plays the Pangui. Tracked in
    `2026-10-21-komikan-rules-and-role-assignment-questions.md`.
 2. **The board sketch is ambiguous** and probably not the traditional shape.
-   Tracked in `2026-10-21-komikan-board-topology-uncertainty.md`.
+   **Resolved 2026-10-21:** the project pins the 38-point layout read off the
+   sketch; see `tasks/closed/2026-10-21-komikan-board-topology-uncertainty.md`
+   and `features/komikan-board-layout.md`. `docs/board.md` now carries a
+   pointer to the authoritative definition.
 3. **Capture geometry is prose, not a rule.** Tracked in
    `2026-10-21-komikan-capture-geometry-uncertainty.md`.
 4. **"Restart with the same or a different ruleset"** (`docs/overview.md` §13)

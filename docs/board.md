@@ -1,5 +1,11 @@
 # Komikan Board Data Structure — Brief Specification
 
+> **Status: superseded.** The sketch below is the source the board was read
+> from. The authoritative node and edge list is
+> `features/komikan-board-layout.md` (38 nodes, 79 edges); use that for
+> implementation. The sketch is kept for reference and for the renderer to
+> reproduce.
+
 ## 1. Board Diagram
 
 The following ASCII diagram represents the board topology. `x` marks initially occupied nodes, and `o` marks initially empty nodes. The bottom vertex of the triangle is shared with the square region.

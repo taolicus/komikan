@@ -80,3 +80,22 @@ needed. The remaining questions still stand.
 Confirm or override the proposed defaults. The rules engine task implements
 whatever is decided here; the values live in the `Ruleset` struct so a variant
 can differ without engine changes.
+
+**Update 2026-10-21:** the engine is written and shipped with the proposed
+defaults, so the game is playable. Nothing here is endorsed yet; the answers
+are still needed.
+
+How each question landed in the code:
+
+| Question | Default | Where it lives |
+|---|---|---|
+| 1. straight line | (a) geometry | `internal/rules`: the node beyond the Trewa must be empty, and the Trewa must be the exact midpoint of the two nodes. One test for every direction, so no pattern table. |
+| 2. double jump | no | A jump always takes exactly one Trewa; a chain of jumps is a chain of single jumps. |
+| 3. must capture | yes | `Ruleset.CapturePreferred`. With it on, only captures are legal when a capture is on offer. |
+| 4. only a Trewa may be jumped | yes | The engine only jumps over a node holding a Trewa; an empty node or the Pangui is not a capture. |
+| 5. the Trewa are stuck | draw | `Ruleset.DrawWhenTrewaCannotMove`, and `Status` has a `DRAW` value. |
+| 6. order of the victory checks | threshold first | `Ruleset.ThresholdBeforeBlocking`. |
+
+Questions 1, 4, and 6 are already settled by the board and by the shape of
+the code. Questions 2, 3, and 5 are the ones that would change how the game
+feels, and each of them is a single field in `rules.DefaultRuleset()`.

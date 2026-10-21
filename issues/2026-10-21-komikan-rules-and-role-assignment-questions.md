@@ -73,3 +73,10 @@ these decisions.
 **Update 2026-10-21:** Part 2 is answered (c). Part 1 is still open: the
 rules engine task was deferred, so the defaults stand as proposals until
 they are confirmed. Part 3 remains open as well.
+
+**Update 2026-10-21 (later the same day):** the rules engine has been
+written and shipped with the proposed defaults, so the game can be played
+while the answers are still open. Every value in Part 1 is a field of
+`rules.Ruleset`, and `rules.DefaultRuleset()` holds the proposals: changing
+an answer means changing one struct, not the engine. The rules are written
+up in `features/komikan-rules.md`.

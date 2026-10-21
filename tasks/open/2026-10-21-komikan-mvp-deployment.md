@@ -4,6 +4,25 @@
 - Area: deployment
 - Dependencies: tasks/open/2026-10-21-komikan-integration-and-concurrency-tests.md, tasks/open/2026-10-21-komikan-web-ui.md
 
+## Status
+
+Most of it is done and live. `https://komikan.tequionet.org` serves the
+coming-soon page at `/`, the rooms and the playable board under `/rooms/`,
+and the API under `/api/`. The database is at
+`/home/dev/komikan/data/komikan.db`, owned by `dev`, mode 0750 on the
+directory. `sh deploy.sh` builds for linux/amd64, copies atomically, restarts
+the service, and checks `/healthz`.
+
+Still to do:
+
+- the runbook in `features/` (where the database lives, how to back it up,
+  how to restart, how to check health) — it does not exist yet;
+- prove the position survives `systemctl restart komikan` through the API,
+  not only in the store;
+- prove the service comes back after a reboot;
+- two people on two devices actually playing a whole game, which no person
+  has done yet.
+
 ## Outcome
 
 The MVP is live at `https://komikan.tequionet.org`: two players can create and

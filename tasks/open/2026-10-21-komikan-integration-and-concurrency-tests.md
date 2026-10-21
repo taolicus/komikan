@@ -2,7 +2,26 @@
 
 - Date: 2026-10-21
 - Area: testing
-- Dependencies: tasks/open/2026-10-21-komikan-storage-layer.md, tasks/open/2026-10-21-komikan-move-api.md
+- Dependencies: tasks/closed/2026-10-21-komikan-storage-layer.md, tasks/closed/2026-10-21-komikan-move-api.md
+
+## Status
+
+Partly done. `internal/httpapi` already plays a whole game through the API
+with two cookie jars standing in for two browsers
+(`TestAGameCanBePlayedToTheEnd`), checks the status codes of every kind of
+bad request, and proves that a stale version is refused while the game keeps
+its state.
+
+Still to do:
+
+- room isolation: activity in one room must not touch another room;
+- identity and seat survive a restart of the server, tested through the API
+  and not only in the store;
+- two simultaneous submissions for the same turn, at the API level, yield
+  exactly one success (the store already proves this with eight concurrent
+  writers);
+- a player can move while the opponent is absent (the server does not care
+  about the opponent being online, but it should be proven).
 
 ## Outcome
 

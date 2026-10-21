@@ -1,0 +1,6 @@
+# The local database of a development run. The server creates it next to the
+# working directory when DB_PATH is not set; it is never part of the source.
+data/
+*.db
+*.db-wal
+*.db-shm

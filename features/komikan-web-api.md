@@ -51,25 +51,55 @@ is identified, how rooms work, and what the endpoints answer.
 | POST | `/api/rooms/{roomID}/join` | take the free seat, or restore the seat |
 | GET | `/api/rooms` | the rooms the identity is seated in |
 | GET | `/api/rooms/{roomID}` | the room summary, for a seat holder |
+| POST | `/api/rooms/{roomID}/moves` | play a move, returns the new summary |
 | GET | `/api/rooms/{roomID}/board` | the board of the room as `image/svg+xml` |
 
-Status codes: `400` malformed, `403` not a seat holder or a failed CSRF
-check, `404` unknown room, `409` full room or a stale state version.
+Status codes: `400` malformed, `403` not a seat holder, out of turn, or a
+failed CSRF check, `404` unknown room, `409` full room, a stale version, a
+room that has not started, or a game that is over, `422` an illegal move.
+
+Every error body carries a message and a machine-readable code:
+`MALFORMED`, `FORBIDDEN`, `NOT_YOUR_TURN`, `CSRF_FAILED`, `NOT_FOUND`,
+`STALE_VERSION`, `ROOM_NOT_ACTIVE`, `GAME_OVER`, `ILLEGAL_MOVE`.
+
+## Playing a move
+
+`POST /api/rooms/{roomID}/moves` takes the node the piece stands on and the
+node it goes to:
+
+```json
+{"from": 7, "to": 11, "version": 3}
+```
+
+The client says where it wants to go; the rules engine decides what that
+means. The version is optional: when it is given and does not match, the
+move is refused with `409 STALE_VERSION`. The response is the whole room
+summary, so the client can redraw without a second request.
+
+The summary carries the board topology (38 nodes with their coordinates and
+79 edges), so the board the browser draws is the same graph the rules engine
+plays on. It also carries the legal moves, but only for the seat holder
+whose turn it is.
 
 ## The game state document
 
 The state is a JSON blob in the `games` row, next to a `version` column that
-rejects stale writes. Its shape is a **placeholder** until the rules engine
-lands:
+rejects stale writes. It is the rules engine's own state document:
 
 ```json
 {
+  "boardLayoutId": "komikan-standard",
   "position": {"7": "PANGUI", "23": "TREWA"},
-  "turn": "PANGUI",
-  "captured": 0
+  "currentPlayer": "PANGUI",
+  "capturedTrewa": 0,
+  "turnNumber": 1,
+  "captureSequenceActive": false,
+  "gameStatus": "IN_PROGRESS",
+  "ruleset": {"...": "..."},
+  "moveHistory": []
 }
 ```
 
-`internal/httpapi/board.go` reads the position out of it to render the
-board. When the rules engine arrives, only the shape changes: the schema and
-the store interface stay as they are.
+The position is stored as a map from node id to piece name, so it reads well
+in the database and in a log line. The schema and the store interface did
+not change when the rules engine landed.

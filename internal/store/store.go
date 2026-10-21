@@ -115,6 +115,9 @@ type GameResult struct {
 	State  State
 	Status string
 	Winner string
+	// Finished tells the store that the game is over, so the room is
+	// marked as finished as well.
+	Finished bool
 }
 
 // Store is the persistence interface the API layer uses.

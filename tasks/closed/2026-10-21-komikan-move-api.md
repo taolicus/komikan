@@ -57,3 +57,40 @@ everything it needs to redraw the board.
   must not reimplement any rule.
 - Polling or SSE for opponent moves is a client concern and belongs to the UI
   task.
+
+## Completion notes
+
+- **Status: completed on 2026-10-21.** The user asked for the room work to
+  stop at the join indication, so the browser interface is only partly
+  done; the API below is complete and tested.
+- `POST /api/rooms/{roomID}/moves` takes `{"from": n, "to": m}` and an
+  optional `"version"`. The client says which node it wants to move to; the
+  rules engine decides what that means, and the API layer never re-implements
+  a rule.
+- The order of the checks is the one in the task: a seat holder, an active
+  room, the caller's turn, a legal move, a game that is not over.
+- The move is applied through the store in one transaction with the version
+  check, so a stale submission is rejected instead of overwriting a newer
+  state.
+- `GET /api/rooms/{roomID}` now carries the board topology (38 nodes with
+  their coordinates and 79 edges), the position, the current player, the
+  captured count against the threshold, the turn number, the status, the
+  winner, the version, the caller's seat and role, the last move, and the
+  legal moves — but only for the seat holder whose turn it is.
+- Every error carries a stable status code and a machine-readable code:
+  `400 MALFORMED`, `403 FORBIDDEN`, `403 NOT_YOUR_TURN`, `403 CSRF_FAILED`,
+  `404 NOT_FOUND`, `409 STALE_VERSION`, `409 ROOM_NOT_ACTIVE`,
+  `409 GAME_OVER`, `422 ILLEGAL_MOVE`.
+- The game state in the database is now the rules engine's own state
+  document. The placeholder shape is gone; the schema did not change.
+- The store marks the room as finished when the game ends, and keeps the
+  game's status in step with the rules engine's status.
+- Tests in `internal/httpapi/moves_test.go`: the puma moves first, a move
+  advances the state and the other player sees it, moving out of turn is
+  refused, an illegal move is refused and changes nothing, a stale version is
+  refused, an outsider cannot move, a move in a waiting room is refused, a
+  malformed body is refused, and a whole game can be played to the end
+  through the API.
+- Verified on the device with `go test ./...` and by hand against the real
+  binary with two cookie jars: create, join, move, illegal move, stale
+  version.

@@ -77,9 +77,14 @@ Under construction. What exists today:
 - rooms and player identities: a browser gets an identity on its first
   visit, creates a room, shares the link, and the second player joins it.
   The roles are dealt at random when the second player arrives. The rooms
-  live at `/rooms/`, and the coming-soon page stays at `/`.
+  live at `/rooms/`, and the coming-soon page stays at `/`;
+- the rules of the game (`internal/rules`): legal moves, captures, turns,
+  and victory, all driven by a configurable ruleset;
+- moves over HTTP, decided by the server, and a board in the browser drawn
+  from the same graph the rules engine plays on.
 
-Next: the rules engine, then the moves and the playable board.
+Next: the remaining interface work, the integration tests, and the answer to
+the open rule questions.
 
 Some rules are still open questions and are tracked in `issues/`.
 

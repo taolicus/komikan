@@ -1,13 +1,9 @@
 package httpapi
 
 import (
-	"encoding/json"
-	"errors"
 	"net/http"
-	"strconv"
 	"time"
 
-	"github.com/taolicus/komikan/internal/board"
 	"github.com/taolicus/komikan/internal/store"
 )
 
@@ -18,14 +14,6 @@ type seatInfo struct {
 	Role     string `json:"role,omitempty"`
 }
 
-// gameInfo describes the game state of a room.
-type gameInfo struct {
-	Version int             `json:"version"`
-	Status  string          `json:"status"`
-	Winner  string          `json:"winner,omitempty"`
-	State   json.RawMessage `json:"state"`
-}
-
 // roomSummary is the JSON shape of a room.
 type roomSummary struct {
 	ID        string     `json:"id"`
@@ -33,9 +21,16 @@ type roomSummary struct {
 	CreatedAt time.Time  `json:"createdAt"`
 	UpdatedAt time.Time  `json:"updatedAt"`
 	Seats     []seatInfo `json:"seats"`
-	Game      *gameInfo  `json:"game,omitempty"`
+	// Game is the state of the game in the room.
+	Game *gameView `json:"game,omitempty"`
+	// Board is the topology of the board, so a client can draw the very
+	// graph the rules engine uses.
+	Board *boardView `json:"board,omitempty"`
 	// You describes the seat of the requesting player, if it has one.
 	You *seatInfo `json:"you,omitempty"`
+	// LegalMoves are the moves the requesting player may play, when it is
+	// their turn.
+	LegalMoves []moveView `json:"legalMoves,omitempty"`
 	// URL is the shareable path of the room.
 	URL string `json:"url"`
 }
@@ -49,26 +44,31 @@ type roomList struct {
 func (s *Server) handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 	player, ok := playerFrom(r.Context())
 	if !ok {
-		s.writeError(w, errors.New("httpapi: no player on the request"))
+		s.writeError(w, errForbidden)
 		return
 	}
 
-	room, err := s.store.CreateRoom(r.Context(), store.NewID(), player.ID,
-		store.State(`{}`), s.initialState())
+	initial, err := encodeState(s.engine.NewGame())
 	if err != nil {
 		s.writeError(w, err)
 		return
 	}
 
-	summary := s.summarize(r, room, player.ID)
-	s.writeJSON(w, http.StatusCreated, summary)
+	room, err := s.store.CreateRoom(r.Context(), store.NewID(), player.ID,
+		store.State(`{}`), initial)
+	if err != nil {
+		s.writeError(w, err)
+		return
+	}
+
+	s.writeJSON(w, http.StatusCreated, s.summarize(r, room, player.ID))
 }
 
 // handleJoinRoom seats the player in the free seat of a room.
 func (s *Server) handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 	player, ok := playerFrom(r.Context())
 	if !ok {
-		s.writeError(w, errors.New("httpapi: no player on the request"))
+		s.writeError(w, errForbidden)
 		return
 	}
 
@@ -79,15 +79,14 @@ func (s *Server) handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	summary := s.summarize(r, room, player.ID)
-	s.writeJSON(w, http.StatusOK, summary)
+	s.writeJSON(w, http.StatusOK, s.summarize(r, room, player.ID))
 }
 
 // handleListRooms lists the rooms the requesting player is seated in.
 func (s *Server) handleListRooms(w http.ResponseWriter, r *http.Request) {
 	player, ok := playerFrom(r.Context())
 	if !ok {
-		s.writeError(w, errors.New("httpapi: no player on the request"))
+		s.writeError(w, errForbidden)
 		return
 	}
 
@@ -108,7 +107,7 @@ func (s *Server) handleListRooms(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleGetRoom(w http.ResponseWriter, r *http.Request) {
 	player, ok := playerFrom(r.Context())
 	if !ok {
-		s.writeError(w, errors.New("httpapi: no player on the request"))
+		s.writeError(w, errForbidden)
 		return
 	}
 
@@ -123,63 +122,4 @@ func (s *Server) handleGetRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.writeJSON(w, http.StatusOK, s.summarize(r, room, player.ID))
-}
-
-// summarize turns a room into its JSON shape for a given player.
-func (s *Server) summarize(r *http.Request, room store.Room, playerID string) roomSummary {
-	summary := roomSummary{
-		ID:        room.ID,
-		Status:    string(room.Status),
-		CreatedAt: room.CreatedAt,
-		UpdatedAt: room.UpdatedAt,
-		Seats:     make([]seatInfo, 0, len(room.Seats)),
-		URL:       "/rooms/" + room.ID,
-	}
-	for _, seat := range room.Seats {
-		summary.Seats = append(summary.Seats, seatInfo{
-			Seat:     seat.Seat,
-			PlayerID: seat.PlayerID,
-			Role:     string(seat.Role),
-		})
-	}
-	if seat, ok := room.Seat(playerID); ok {
-		you := seatInfo{
-			Seat:     seat.Seat,
-			PlayerID: seat.PlayerID,
-			Role:     string(seat.Role),
-		}
-		summary.You = &you
-	}
-	if game, err := s.store.Game(r.Context(), room.ID); err == nil {
-		summary.Game = &gameInfo{
-			Version: game.Version,
-			Status:  game.Status,
-			Winner:  game.Winner,
-			State:   game.State,
-		}
-	}
-	return summary
-}
-
-// initialState builds the game state of a new room from the standard
-// starting position. The rules engine replaces this once it lands.
-func (s *Server) initialState() store.State {
-	position := make(map[string]string, len(s.startPosition))
-	for id, piece := range s.startPosition {
-		name := "TREWA"
-		if piece == board.PiecePangui {
-			name = "PANGUI"
-		}
-		position[strconv.Itoa(int(id))] = name
-	}
-	data, err := json.Marshal(map[string]any{
-		"position": position,
-		"turn":     "PANGUI",
-		"captured": 0,
-	})
-	if err != nil {
-		// The state is built from plain values, so this cannot fail.
-		panic("httpapi: build initial state: " + err.Error())
-	}
-	return data
 }

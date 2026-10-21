@@ -1,17 +1,16 @@
 package httpapi
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/taolicus/komikan/internal/board"
-	"github.com/taolicus/komikan/internal/store"
 )
 
 // handleRoomBoard renders the board of a room in its current position.
+//
+// The game page draws the board in the browser from the board graph, so this
+// endpoint is the fallback for a plain image of the position.
 func (s *Server) handleRoomBoard(w http.ResponseWriter, r *http.Request) {
 	player, ok := playerFrom(r.Context())
 	if !ok {
@@ -34,10 +33,15 @@ func (s *Server) handleRoomBoard(w http.ResponseWriter, r *http.Request) {
 		s.writeError(w, err)
 		return
 	}
-	position, err := s.positionFromState(game.State)
+	state, err := s.decodeState(game.State)
 	if err != nil {
 		s.writeError(w, err)
 		return
+	}
+
+	position := board.Position{}
+	for id, piece := range state.Position {
+		position[id] = piece
 	}
 
 	w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")
@@ -45,32 +49,4 @@ func (s *Server) handleRoomBoard(w http.ResponseWriter, r *http.Request) {
 	if _, err := w.Write([]byte(s.board.RenderSVG(position))); err != nil {
 		s.log.Error("write board", "error", err)
 	}
-}
-
-// positionFromState reads the position out of a game state document.
-//
-// The shape of the state is a placeholder until the rules engine lands: it
-// carries the position as a map from node id to piece name.
-func (s *Server) positionFromState(state store.State) (board.Position, error) {
-	var doc struct {
-		Position map[string]string `json:"position"`
-	}
-	if err := json.Unmarshal(state, &doc); err != nil {
-		return nil, fmt.Errorf("httpapi: decode game state: %w", err)
-	}
-
-	position := board.Position{}
-	for key, name := range doc.Position {
-		id, err := strconv.Atoi(key)
-		if err != nil {
-			continue
-		}
-		switch name {
-		case "PANGUI":
-			position[board.NodeID(id)] = board.PiecePangui
-		case "TREWA":
-			position[board.NodeID(id)] = board.PieceTrewa
-		}
-	}
-	return position, nil
 }

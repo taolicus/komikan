@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Komikan · salas</title>
+<title>Komikan · partida</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,6 +14,9 @@
     --ink: #f6efe0;
     --muted: #8d8474;
     --line: #2a2620;
+    --gold: #d8c9a6;
+    --green: #14532d;
+    --red: #7f1d1d;
   }
   html {
     height: 100%;
@@ -26,32 +29,30 @@
     justify-content: center;
     box-sizing: border-box;
     min-height: 100%;
-    padding: 2.5rem 1rem 3rem;
+    padding: 2rem 1rem 3rem;
     color: var(--ink);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
   main {
-    width: min(92vw, 560px);
+    width: min(94vw, 520px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: auto 0;
   }
   h1 {
     margin: 0;
     font-family: "Cinzel", Georgia, "Times New Roman", serif;
-    font-size: clamp(2rem, 9vw, 3rem);
+    font-size: clamp(1.6rem, 7vw, 2.4rem);
     font-weight: 700;
     letter-spacing: 0.06em;
   }
-  .soon {
-    margin: 0.6rem 0 1.6rem;
+  .sub {
+    margin: 0.5rem 0 1.2rem;
     color: var(--muted);
-    font-size: 0.8rem;
-    font-weight: 400;
-    letter-spacing: 0.35em;
-    text-indent: 0.35em;
+    font-size: 0.78rem;
+    letter-spacing: 0.3em;
+    text-indent: 0.3em;
     text-transform: uppercase;
   }
   button {
@@ -60,7 +61,7 @@
     background: #1d1a15;
     border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 0.6rem 1.1rem;
+    padding: 0.55rem 1.1rem;
     cursor: pointer;
   }
   button:hover {
@@ -75,13 +76,13 @@
     gap: 0.6rem;
     flex-wrap: wrap;
     justify-content: center;
-    margin: 0 0 1.4rem;
+    margin: 0 0 1rem;
   }
   .card {
     width: 100%;
     border: 1px solid var(--line);
     border-radius: 10px;
-    padding: 0.9rem 1rem;
+    padding: 0.85rem 1rem;
     margin-bottom: 0.7rem;
     display: flex;
     justify-content: space-between;
@@ -98,57 +99,91 @@
     color: var(--muted);
     font-size: 0.8rem;
     text-align: right;
-    white-space: nowrap;
   }
   .board {
-    width: min(78vw, 340px);
-    margin-bottom: 1.4rem;
+    width: min(90vw, 440px);
+    margin-bottom: 1rem;
   }
-  .board svg, .board img {
+  .board svg {
     width: 100%;
     height: auto;
     display: block;
     border-radius: 10px;
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
   }
-  table.seats {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 1.2rem;
-    font-size: 0.92rem;
-  }
-  table.seats th, table.seats td {
-    text-align: left;
-    padding: 0.45rem 0.2rem;
-    border-bottom: 1px solid var(--line);
-  }
-  table.seats th {
-    color: var(--muted);
-    font-weight: 500;
-    font-size: 0.78rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+  .status {
+    font-family: "Cinzel", Georgia, serif;
+    letter-spacing: 0.04em;
+    margin: 0 0 0.9rem;
+    color: var(--gold);
+    text-align: center;
   }
   .note {
     color: var(--muted);
     font-size: 0.9rem;
     text-align: center;
     margin: 0.4rem 0 0;
+    min-height: 1.3em;
   }
-  .status {
-    font-family: "Cinzel", Georgia, serif;
-    letter-spacing: 0.05em;
-    margin: 0 0 1.2rem;
-    color: #d8c9a6;
+  .score {
+    display: flex;
+    gap: 1.2rem;
+    justify-content: center;
+    margin-bottom: 0.9rem;
+    font-size: 0.9rem;
+    color: var(--muted);
   }
+  .score b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .legend {
+    display: flex;
+    gap: 1.1rem;
+    justify-content: center;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 0.9rem;
+  }
+  .legend span::before {
+    content: "";
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    border-radius: 50%;
+    margin-right: 0.4em;
+    vertical-align: baseline;
+  }
+  .legend .pangui::before { background: var(--green); }
+  .legend .trewa::before { background: var(--red); }
+  .legend .yours::before { background: var(--gold); }
+  table.seats {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+  table.seats th, table.seats td {
+    text-align: left;
+    padding: 0.4rem 0.2rem;
+    border-bottom: 1px solid var(--line);
+  }
+  table.seats th {
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 <main>
   <h1>Komikan</h1>
-  <p class="soon" id="heading">Salas</p>
+  <p class="sub" id="heading">Salas</p>
 
-  <section id="list-view" hidden>
+  <section id="list-view" class="hidden">
     <div class="actions">
       <button id="create">Crear sala</button>
     </div>
@@ -156,8 +191,14 @@
     <p class="note" id="list-note"></p>
   </section>
 
-  <section id="room-view" hidden>
+  <section id="room-view" class="hidden">
     <p class="status" id="room-status"></p>
+    <div class="score" id="score"></div>
+    <div class="legend">
+      <span class="pangui">Pangui</span>
+      <span class="trewa">Trewa</span>
+      <span class="yours">Tu jugada</span>
+    </div>
     <div class="board" id="room-board"></div>
     <table class="seats">
       <thead>
@@ -177,17 +218,30 @@
 (function () {
   "use strict";
 
+  const CELL = 64;
+  const MARGIN = 48;
+  const SVG_NS = "http://www.w3.org/2000/svg";
+
+  const el = (id) => document.getElementById(id);
+  const roomMatch = location.pathname.match(/^\/rooms\/([A-Za-z0-9_-]+)\/?$/);
+  const roomID = roomMatch ? roomMatch[1] : null;
+
+  let board = null;
+  let room = null;
+  let selected = null;
+  let busy = false;
+
   const csrf = () => {
     const match = document.cookie.match(/(?:^|;\s*)komikan_csrf=([^;]*)/);
     return match ? decodeURIComponent(match[1]) : "";
   };
 
-  const api = async (method, path) => {
+  const api = async (method, path, body) => {
     const res = await fetch(path, {
       method: method,
       credentials: "same-origin",
       headers: {"X-CSRF-Token": csrf(), "Content-Type": "application/json"},
-      body: method === "GET" ? undefined : "{}",
+      body: body === undefined ? undefined : JSON.stringify(body),
     });
     const text = await res.text();
     let data = null;
@@ -199,71 +253,230 @@
     return {status: res.status, data: data};
   };
 
-  const el = (id) => document.getElementById(id);
-  const roomID = location.pathname.match(/^\/rooms\/([A-Za-z0-9_-]+)\/?$/);
-
   const roleName = (role) => {
     if (role === "PANGUI") return "Pangui 🐆";
     if (role === "TREWA") return "Trewa 🐕";
     return "—";
   };
 
-  async function showList() {
-    el("heading").textContent = "Salas";
-    el("list-view").hidden = false;
-    el("room-view").hidden = true;
+  // ---- drawing -------------------------------------------------------
 
-    const res = await api("GET", "/api/rooms");
-    const rooms = (res.data && res.data.rooms) || [];
-    const box = el("rooms");
-    box.innerHTML = "";
-    for (const room of rooms) {
-      const card = document.createElement("div");
-      card.className = "card";
-      const link = document.createElement("a");
-      link.href = "/rooms/" + room.id;
-      link.textContent = room.id.slice(0, 8);
-      const meta = document.createElement("span");
-      meta.className = "meta";
-      meta.textContent = room.status + (room.you && room.you.role ? " · " + roleName(room.you.role) : "");
-      card.appendChild(link);
-      card.appendChild(meta);
-      box.appendChild(card);
+  const nodeByID = (id) => {
+    for (const node of board.nodes) {
+      if (node.id === id) return node;
     }
-    el("list-note").textContent = rooms.length ? "" : "Todavía no tienes salas. Crea una y comparte el enlace.";
+    return null;
+  };
+
+  const place = (node) => ({
+    x: MARGIN + node.x * CELL,
+    y: MARGIN + node.y * CELL,
+  });
+
+  const element = (name, attrs, text) => {
+    const node = document.createElementNS(SVG_NS, name);
+    for (const key in attrs) {
+      node.setAttribute(key, attrs[key]);
+    }
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+
+  // legalMovesFor returns the moves that start on a node.
+  const movesFrom = (id) => (room.legalMoves || []).filter((move) => move.from === id);
+
+  function draw() {
+    const box = el("room-board");
+    box.innerHTML = "";
+    if (!board) return;
+
+    let maxX = 0;
+    let maxY = 0;
+    for (const node of board.nodes) {
+      if (node.x > maxX) maxX = node.x;
+      if (node.y > maxY) maxY = node.y;
+    }
+    const width = 2 * MARGIN + maxX * CELL;
+    const height = 2 * MARGIN + maxY * CELL;
+
+    const svg = element("svg", {
+      xmlns: SVG_NS,
+      viewBox: "0 0 " + width + " " + height,
+      width: width,
+      height: height,
+      "font-family": "sans-serif",
+    });
+    svg.appendChild(element("title", {}, "Tablero de Komikan"));
+    svg.appendChild(element("rect", {width: width, height: height, fill: "#fdfaf4", rx: 10}));
+
+    const lines = element("g", {
+      stroke: "#475569",
+      "stroke-width": 3,
+      "stroke-linecap": "round",
+    });
+    for (const edge of board.edges) {
+      const a = place(nodeByID(edge[0]));
+      const b = place(nodeByID(edge[1]));
+      lines.appendChild(element("line", {x1: a.x, y1: a.y, x2: b.x, y2: b.y}));
+    }
+    svg.appendChild(lines);
+
+    const position = (room.game && room.game.position) || {};
+    const last = room.game && room.game.lastMove;
+    const selectedMoves = selected === null ? [] : movesFrom(selected);
+
+    for (const node of board.nodes) {
+      const p = place(node);
+      const piece = position[String(node.id)];
+      const id = node.id;
+
+      if (last && (last.from === id || last.to === id)) {
+        svg.appendChild(element("circle", {
+          cx: p.x, cy: p.y, r: 24, fill: "none", stroke: "#c9a227", "stroke-width": 3, opacity: 0.65,
+        }));
+      }
+
+      if (piece === "PANGUI") {
+        svg.appendChild(element("circle", {cx: p.x, cy: p.y, r: 20, fill: "#14532d"}));
+        svg.appendChild(element("text", {
+          x: p.x, y: p.y + 11, "font-size": 32, "text-anchor": "middle",
+        }, "🐆"));
+      } else if (piece === "TREWA") {
+        svg.appendChild(element("circle", {cx: p.x, cy: p.y, r: 16, fill: "#7f1d1d"}));
+        svg.appendChild(element("text", {
+          x: p.x, y: p.y + 9, "font-size": 25, "text-anchor": "middle",
+        }, "🐕"));
+      } else {
+        svg.appendChild(element("circle", {
+          cx: p.x, cy: p.y, r: 6, fill: "#ffffff", stroke: "#94a3b8", "stroke-width": 2,
+        }));
+      }
+
+      // The destination of a legal move, and the piece that may move.
+      const destination = selectedMoves.find((move) => move.to === id);
+      if (destination) {
+        svg.appendChild(element("circle", {
+          cx: p.x, cy: p.y, r: 26, fill: "none",
+          stroke: destination.type === "CAPTURE" ? "#c9a227" : "#2563eb",
+          "stroke-width": 4,
+        }));
+        svg.appendChild(element("circle", {
+          cx: p.x, cy: p.y, r: 8,
+          fill: destination.type === "CAPTURE" ? "#c9a227" : "#2563eb",
+        }));
+      }
+      if (selected === id) {
+        svg.appendChild(element("circle", {
+          cx: p.x, cy: p.y, r: 28, fill: "none", stroke: "#2563eb", "stroke-width": 3,
+        }));
+      }
+
+      const hit = element("circle", {
+        cx: p.x, cy: p.y, r: 26, fill: "transparent", style: "cursor:pointer",
+      });
+      hit.addEventListener("click", () => onNodeClick(id));
+      svg.appendChild(hit);
+    }
+
+    box.appendChild(svg);
   }
 
-  async function showRoom(id) {
-    el("heading").textContent = "Sala";
-    el("list-view").hidden = true;
-    el("room-view").hidden = false;
+  // ---- playing --------------------------------------------------------
 
-    const res = await api("GET", "/api/rooms/" + encodeURIComponent(id));
-    if (res.status === 404) {
-      el("room-status").textContent = "La sala no existe.";
-      el("room-seats").innerHTML = "";
-      el("join").hidden = true;
+  function onNodeClick(id) {
+    if (busy || !room || !room.you) return;
+    if (!room.legalMoves || room.legalMoves.length === 0) return;
+
+    const moves = movesFrom(id);
+    if (moves.length > 0) {
+      selected = selected === id ? null : id;
+      draw();
       return;
     }
-    if (res.status === 403) {
-      el("room-status").textContent = "No estás en esta sala.";
-      el("room-seats").innerHTML = "";
+
+    const move = (room.legalMoves || []).find((m) => m.to === id);
+    if (!move) return;
+    selected = null;
+    submit(move);
+  }
+
+  async function submit(move) {
+    busy = true;
+    el("room-note").textContent = "";
+    const res = await api("POST", "/api/rooms/" + encodeURIComponent(roomID) + "/moves", {
+      from: move.from,
+      to: move.to,
+      version: room.game ? room.game.version : undefined,
+    });
+    busy = false;
+    if (res.status === 200) {
+      room = res.data;
+      renderRoom(room);
+      return;
+    }
+    const code = res.data && res.data.code ? res.data.code : "";
+    if (res.status === 409) {
+      el("room-note").textContent = "El juego cambió; se actualiza.";
+      await refresh();
+      return;
+    }
+    el("room-note").textContent = code === "NOT_YOUR_TURN"
+      ? "No es tu turno."
+      : (res.data && res.data.error ? res.data.error : "No se pudo jugar.");
+  }
+
+  // ---- views ----------------------------------------------------------
+
+  function renderRoom(data) {
+    // The poll redraws the board every couple of seconds. The piece the
+    // player picked stays picked as long as the game has not moved on.
+    const previous = room && room.game ? room.game.version : null;
+    room = data;
+    board = data.board;
+    if (!room.game || previous !== room.game.version) {
+      selected = null;
+    }
+
+    const game = data.game || {};
+    const status = el("room-status");
+    const note = el("room-note");
+    note.textContent = "";
+
+    if (!data.you) {
+      status.textContent = "No estás en esta sala.";
       el("join").hidden = false;
       el("join").disabled = false;
+      draw();
       return;
     }
-    const room = res.data;
     el("join").hidden = true;
-    el("room-status").textContent = room.status === "ACTIVE" ? "En juego" : "Esperando al segundo jugador";
-    el("room-note").textContent = room.you && room.you.role
-      ? "Juegas como " + roleName(room.you.role)
-      : "";
+
+    if (game.status === "PANGUI_WON") {
+      status.textContent = "Gana el Pangui 🐆";
+    } else if (game.status === "PU_TREWA_WON") {
+      status.textContent = "Ganan los Trewa 🐕";
+    } else if (game.status === "DRAW") {
+      status.textContent = "Empate";
+    } else if (data.status === "WAITING") {
+      status.textContent = "Esperando al segundo jugador";
+    } else if (game.currentPlayer === data.you.role) {
+      status.textContent = "Te toca";
+    } else {
+      status.textContent = "Turno de " + roleName(game.currentPlayer);
+    }
+
+    const captured = game.capturedTrewa || 0;
+    const threshold = game.captureThreshold || 6;
+    el("score").innerHTML =
+      "<span>Pangui <b>" + captured + "</b> / " + threshold + "</span>" +
+      "<span>Trewa <b>" + (12 - captured) + "</b> / 12</span>";
 
     const body = el("room-seats");
     body.innerHTML = "";
-    for (const seat of room.seats) {
+    for (const seat of data.seats) {
       const row = document.createElement("tr");
-      for (const value of [seat.seat, seat.playerId.slice(0, 8), roleName(seat.role)]) {
+      const mine = data.you && seat.playerId === data.you.playerId;
+      for (const value of [seat.seat, (mine ? "tú" : seat.playerId.slice(0, 8)), roleName(seat.role)]) {
         const cell = document.createElement("td");
         cell.textContent = value;
         row.appendChild(cell);
@@ -271,16 +484,52 @@
       body.appendChild(row);
     }
 
-    const version = room.game ? room.game.version : 0;
-    el("room-board").innerHTML = "";
-    const img = document.createElement("img");
-    img.alt = "Tablero de Komikan";
-    img.src = "/api/rooms/" + encodeURIComponent(id) + "/board?v=" + version;
-    el("room-board").appendChild(img);
+    draw();
+  }
+
+  async function refresh() {
+    if (!roomID) return;
+    const res = await api("GET", "/api/rooms/" + encodeURIComponent(roomID));
+    if (res.status === 404) {
+      el("room-status").textContent = "La sala no existe.";
+      return;
+    }
+    if (res.status === 403) {
+      renderRoom({status: "UNKNOWN", seats: [], game: null});
+      return;
+    }
+    if (res.status === 200) {
+      renderRoom(res.data);
+    }
+  }
+
+  async function showList() {
+    el("heading").textContent = "Salas";
+    el("list-view").classList.remove("hidden");
+    el("room-view").classList.add("hidden");
+
+    const res = await api("GET", "/api/rooms");
+    const rooms = (res.data && res.data.rooms) || [];
+    const box = el("rooms");
+    box.innerHTML = "";
+    for (const item of rooms) {
+      const card = document.createElement("div");
+      card.className = "card";
+      const link = document.createElement("a");
+      link.href = "/rooms/" + item.id;
+      link.textContent = item.id.slice(0, 8);
+      const meta = document.createElement("span");
+      meta.className = "meta";
+      meta.textContent = item.status + (item.you && item.you.role ? " · " + roleName(item.you.role) : "");
+      card.appendChild(link);
+      card.appendChild(meta);
+      box.appendChild(card);
+    }
+    el("list-note").textContent = rooms.length ? "" : "Todavía no tienes salas. Crea una y comparte el enlace.";
   }
 
   el("create").addEventListener("click", async () => {
-    const res = await api("POST", "/api/rooms");
+    const res = await api("POST", "/api/rooms", {});
     if (res.status === 201 && res.data) {
       location.href = "/rooms/" + res.data.id;
     }
@@ -288,9 +537,9 @@
 
   el("join").addEventListener("click", async () => {
     if (!roomID) return;
-    const res = await api("POST", "/api/rooms/" + encodeURIComponent(roomID[1]) + "/join");
+    const res = await api("POST", "/api/rooms/" + encodeURIComponent(roomID) + "/join", {});
     if (res.status === 200) {
-      showRoom(roomID[1]);
+      renderRoom(res.data);
     } else {
       el("room-note").textContent = res.data && res.data.error ? res.data.error : "No se pudo unirse.";
     }
@@ -309,16 +558,21 @@
     location.href = "/rooms/";
   });
 
-  function refresh() {
+  function start() {
     if (roomID) {
-      showRoom(roomID[1]);
+      el("heading").textContent = "Partida";
+      el("room-view").classList.remove("hidden");
+      el("list-view").classList.add("hidden");
+      refresh();
     } else {
       showList();
     }
   }
 
-  refresh();
-  setInterval(refresh, 3000);
+  start();
+  setInterval(() => {
+    if (roomID && !busy) refresh();
+  }, 2000);
 })();
 </script>
 </body>

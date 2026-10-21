@@ -14,6 +14,7 @@ import (
 	"net/http"
 
 	"github.com/taolicus/komikan/internal/board"
+	"github.com/taolicus/komikan/internal/rules"
 	"github.com/taolicus/komikan/internal/store"
 	"github.com/taolicus/komikan/web"
 )
@@ -33,12 +34,16 @@ type Config struct {
 	Version string
 	// Store persists players, rooms, and games.
 	Store store.Store
+	// Ruleset is the variant every room plays. A zero value means the
+	// default ruleset.
+	Ruleset rules.Ruleset
 }
 
 // Server holds the state shared by the handlers.
 type Server struct {
 	log           *slog.Logger
 	board         *board.Board
+	engine        *rules.Engine
 	startPosition board.Position
 	page          []byte
 	roomsPage     []byte
@@ -74,9 +79,19 @@ func New(cfg Config) (*Server, error) {
 		return nil, fmt.Errorf("httpapi: read rooms page: %w", err)
 	}
 
+	ruleset := cfg.Ruleset
+	if ruleset == (rules.Ruleset{}) {
+		ruleset = rules.DefaultRuleset()
+	}
+	engine, err := rules.NewEngine(b, ruleset)
+	if err != nil {
+		return nil, fmt.Errorf("httpapi: build the rules engine: %w", err)
+	}
+
 	s := &Server{
 		log:           logger,
 		board:         b,
+		engine:        engine,
 		startPosition: pos,
 		page:          page,
 		roomsPage:     roomsPage,
@@ -102,6 +117,7 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("GET /api/rooms", s.withIdentity(s.handleListRooms))
 	s.mux.HandleFunc("GET /api/rooms/{roomID}", s.withIdentity(s.handleGetRoom))
 	s.mux.HandleFunc("GET /api/rooms/{roomID}/board", s.withIdentity(s.handleRoomBoard))
+	s.mux.HandleFunc("POST /api/rooms/{roomID}/moves", s.withIdentity(s.handleSubmitMove))
 
 	// The room pages. They are served to anyone: the API behind them checks
 	// who is allowed to see a room.
@@ -149,25 +165,37 @@ func (s *Server) writeJSON(w http.ResponseWriter, status int, body any) {
 }
 
 // writeError maps a domain error onto a status code and writes it.
+//
+// The body always carries an "error" message and a machine-readable "code",
+// so a client can tell a stale version from an illegal move without reading
+// the message.
 func (s *Server) writeError(w http.ResponseWriter, err error) {
 	status := http.StatusInternalServerError
+	code := "INTERNAL_ERROR"
+	message := "internal error"
+
+	var apiErr *apiError
 	switch {
+	case errors.As(err, &apiErr):
+		status = apiErr.status
+		code = apiErr.code
+		message = apiErr.msg
 	case errors.Is(err, store.ErrNotFound):
-		status = http.StatusNotFound
+		status, code, message = http.StatusNotFound, "NOT_FOUND", "not found"
 	case errors.Is(err, store.ErrConflict):
-		status = http.StatusConflict
+		status, code, message = http.StatusConflict, "CONFLICT", "conflict"
 	case errors.Is(err, store.ErrInvalid):
-		status = http.StatusBadRequest
-	case errors.Is(err, errForbidden), errors.Is(err, errCSRF):
-		status = http.StatusForbidden
+		status, code, message = http.StatusBadRequest, "MALFORMED", "malformed request"
+	case errors.Is(err, errForbidden):
+		status, code, message = http.StatusForbidden, "FORBIDDEN", "not your room"
+	case errors.Is(err, errCSRF):
+		status, code, message = http.StatusForbidden, "CSRF_FAILED", "csrf check failed"
 	}
 
-	message := err.Error()
 	if status == http.StatusInternalServerError {
 		s.log.Error("request failed", "error", err)
-		message = "internal error"
 	}
-	s.writeJSON(w, status, map[string]string{"error": message})
+	s.writeJSON(w, status, map[string]string{"error": message, "code": code})
 }
 
 // renderPage fills the board marker in the page template with the board

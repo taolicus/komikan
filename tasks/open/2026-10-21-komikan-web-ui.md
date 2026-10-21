@@ -2,7 +2,41 @@
 
 - Date: 2026-10-21
 - Area: web
-- Dependencies: tasks/open/2026-10-21-komikan-move-api.md, tasks/open/2026-10-21-komikan-board-data-and-renderer.md, issues/2026-10-21-komikan-client-architecture-choices.md
+- Dependencies: tasks/closed/2026-10-21-komikan-move-api.md, tasks/closed/2026-10-21-komikan-board-data-and-renderer.md, issues/2026-10-21-komikan-client-architecture-choices.md
+
+## Status
+
+**Parked on 2026-10-21 at the user's request.** The room work was enough for
+this round: the rooms exist, a browser can create one and share it, the
+second player joins it, and the page says so. The rest of this task is
+picked up later.
+
+What is already there, in `web/rooms.html`:
+
+- the room list at `/rooms/`, with a create action and the role of each
+  room;
+- the room page at `/rooms/{roomID}`, with the seats, the roles, whose turn
+  it is, the captured count against the threshold, the winner at the end,
+  and a copy-link button;
+- the board drawn in the browser as SVG from the topology the server sends,
+  with the puma and the dogs drawn distinctly, the last move marked, and the
+  legal destinations highlighted when a piece is picked;
+- clicking a destination submits the move, and the board is refreshed by
+  polling every two seconds.
+
+What is still to do:
+
+- the phone layout was never looked at by a person; the widths, the touch
+  targets and the scroll on a narrow screen need a real look;
+- the waiting view (only one seat taken) is plain: no invitation screen, no
+  copy-link prominence, no indication that the second player has arrived
+  beyond the status line;
+- the game page has no move history, no captured pieces shown on the board,
+  and no way to see the opponent's last move other than the marked node;
+- the coming-soon page is still served at `/`, and this task's scope says it
+  should be replaced by the home page listing the player's rooms. The user
+  asked for the coming-soon page to stay, so it stays until they say
+  otherwise.
 
 ## Outcome
 

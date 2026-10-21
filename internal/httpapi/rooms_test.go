@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/taolicus/komikan/internal/rules"
 	"github.com/taolicus/komikan/internal/store"
 )
 
@@ -179,21 +180,20 @@ func TestCreateRoomSeatsTheCreator(t *testing.T) {
 	if room.Game == nil {
 		t.Fatal("the room has no game state")
 	}
-	var state struct {
-		Position map[string]string `json:"position"`
-		Turn     string            `json:"turn"`
+	if len(room.Game.Position) != 13 {
+		t.Errorf("pieces = %d, want 13", len(room.Game.Position))
 	}
-	if err := json.Unmarshal(room.Game.State, &state); err != nil {
-		t.Fatalf("decode state: %v", err)
+	if room.Game.Position["7"] != "PANGUI" {
+		t.Errorf("the Pangui is not on node 7: %v", room.Game.Position)
 	}
-	if len(state.Position) != 13 {
-		t.Errorf("pieces = %d, want 13", len(state.Position))
+	if room.Game.CurrentPlayer != string(rules.PlayerPangui) {
+		t.Errorf("current player = %q, want PANGUI", room.Game.CurrentPlayer)
 	}
-	if state.Position["7"] != "PANGUI" {
-		t.Errorf("the Pangui is not on node 7: %v", state.Position)
+	if room.Game.Threshold != 6 {
+		t.Errorf("threshold = %d, want 6", room.Game.Threshold)
 	}
-	if state.Turn != "PANGUI" {
-		t.Errorf("turn = %q, want PANGUI", state.Turn)
+	if room.Board == nil || len(room.Board.Nodes) != 38 {
+		t.Errorf("the room does not carry the board topology")
 	}
 }
 

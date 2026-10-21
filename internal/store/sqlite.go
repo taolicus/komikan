@@ -171,7 +171,7 @@ func (s *sqliteStore) CreateRoom(ctx context.Context, roomID, creatorID string, 
 	}
 	if _, err := tx.ExecContext(ctx,
 		"insert into games (room_id, state, version, status, winner, updated_at) values (?, ?, 0, ?, '', ?)",
-		roomID, string(initial), "WAITING", now.UnixMilli()); err != nil {
+		roomID, string(initial), "IN_PROGRESS", now.UnixMilli()); err != nil {
 		return Room{}, fmt.Errorf("store: create game: %w", err)
 	}
 
@@ -364,7 +364,7 @@ func (s *sqliteStore) JoinRoom(ctx context.Context, roomID, playerID string) (Ro
 		}
 		if _, err := tx.ExecContext(ctx,
 			"update games set status = ?, updated_at = ? where room_id = ?",
-			"ACTIVE", now.UnixMilli(), roomID); err != nil {
+			"IN_PROGRESS", now.UnixMilli(), roomID); err != nil {
 			return Room{}, fmt.Errorf("store: activate game: %w", err)
 		}
 	}
@@ -449,6 +449,19 @@ func (s *sqliteStore) ApplyMove(ctx context.Context, roomID string, expectedVers
 		"insert into moves (room_id, seq, player_id, payload, created_at) values (?, ?, ?, ?, ?)",
 		roomID, expectedVersion+1, playerID, string(payload), now.UnixMilli()); err != nil {
 		return Game{}, fmt.Errorf("store: record move: %w", err)
+	}
+
+	if result.Finished {
+		if _, err := tx.ExecContext(ctx,
+			"update rooms set status = ?, updated_at = ? where id = ?",
+			string(RoomFinished), now.UnixMilli(), roomID); err != nil {
+			return Game{}, fmt.Errorf("store: finish room: %w", err)
+		}
+	} else {
+		if _, err := tx.ExecContext(ctx,
+			"update rooms set updated_at = ? where id = ?", now.UnixMilli(), roomID); err != nil {
+			return Game{}, fmt.Errorf("store: touch room: %w", err)
+		}
 	}
 
 	if err := tx.Commit(); err != nil {

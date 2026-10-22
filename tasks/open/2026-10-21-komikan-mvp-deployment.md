@@ -50,7 +50,10 @@ a service restart.
 - `deploy.sh` updated for the new binary and the data path; keep the atomic
   copy and the health check.
 - nginx: confirm the existing site still proxies correctly; only change it if
-  the new endpoints require it (SSE is not used in the MVP).
+  the new endpoints require it. (The room event stream was added later and
+  needed no change: the vhost already proxies HTTP/1.1 with a long read
+  timeout, and the stream itself turns buffering off with
+  `X-Accel-Buffering: no`.)
 - A short runbook in `features/` covering: where the database lives, how to
   back it up, how to restart, and how to check health.
 
@@ -80,3 +83,7 @@ a service restart.
   komikan-specific parts rather than repeating the general pattern.
 - The site currently serves a coming-soon page, so this is the first
   deployment that changes what the URL shows.
+- **Update 2026-10-22:** the room event stream was checked through the public
+  URL with two cookie jars: a move played by one browser arrived on the
+  other's open stream, and the payload carried the new threshold. The
+  deployed binary reports `version=edc2b2c`.

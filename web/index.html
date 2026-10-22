@@ -220,17 +220,29 @@
       });
   };
 
-  // The browser gets its identity on this call, so the new room belongs to
-  // whoever pressed the button.
+  // The token the browser has to echo on a write. The server refuses a write
+  // that arrives with a session but without this token.
+  var csrf = function () {
+    var match = document.cookie.match(/(?:^|;\s*)komikan_csrf=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : "";
+  };
+
+  // The browser gets its identity on the first call, so the new room belongs
+  // to whoever pressed the button. The button waits for the list, which is
+  // that first call, so the session and its token are in place.
+  var ready = loadGames();
+
   button.addEventListener("click", function () {
     button.disabled = true;
     note.textContent = "";
 
-    fetch("/api/rooms", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: {"Content-Type": "application/json"},
-      body: "{}",
+    ready.then(function () {
+      return fetch("/api/rooms", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {"Content-Type": "application/json", "X-CSRF-Token": csrf()},
+        body: "{}",
+      });
     }).then(function (res) {
       if (res.status !== 201) {
         throw new Error("the room was not created");
@@ -243,8 +255,6 @@
       note.textContent = "No se pudo crear la partida. Inténtalo de nuevo.";
     });
   });
-
-  loadGames();
 })();
 </script>
 </body>

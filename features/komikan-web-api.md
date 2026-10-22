@@ -94,7 +94,11 @@ room; both are plain scripts in static files, embedded in the binary.
 
 - The home page starts a game with a button (`POST /api/rooms`) and lists the
   games of the identity (`GET /api/rooms`), with the state of each one and
-  the role of the player.
+  the role of the player. The list is also the first call of the page, so it
+  is the call that gives the browser its session and its CSRF token: the
+  button waits for the list before it creates a game, and sends the token in
+  the `X-CSRF-Token` header. A write that arrives with a session and without
+  that header is refused with `CSRF_FAILED`.
 - The room page reads the room (`GET /api/rooms/{roomID}`), draws the board,
   and plays the moves (`POST /api/rooms/{roomID}/moves`). While the room
   waits for the second player it shows the link of the room, with a field

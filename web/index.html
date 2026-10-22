@@ -152,6 +152,12 @@
     color: var(--ink);
     border-bottom-color: #6b6252;
   }
+  .about {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
   .about.hidden {
     display: none;
   }
@@ -160,7 +166,20 @@
     max-width: 32rem;
     color: var(--muted);
     font-size: 0.95rem;
-    line-height: 1.65;
+    line-height: 1.8;
+    text-align: center;
+  }
+  .blurb .lead {
+    display: block;
+    margin-bottom: 0.9rem;
+    color: var(--ink);
+    font-size: 1.02rem;
+    line-height: 1.7;
+    font-weight: 500;
+  }
+  .blurb strong {
+    color: #e7dcc6;
+    font-weight: 600;
   }
 </style>
 </head>
@@ -181,11 +200,12 @@
     <div class="board">
 <!--BOARD-->
     </div>
-    <p class="blurb">Komikan es un juego de mesa mapuche para dos: uno lleva al
-    Pangui, el puma, y el otro a los doce Trewa, los perros. Sobre un tablero de
-    38 puntos, el puma avanza un paso por turno y salta sobre los perros para
-    capturarlos. Gana al hacer seis capturas o al dejar a los perros sin jugada;
-    los perros ganan al acorralar al puma.</p>
+    <p class="blurb"><span class="lead">Komikan es un juego de mesa mapuche para dos.</span>
+    Uno lleva al <strong>Pangui</strong>, el puma, y el otro a los doce
+    <strong>Trewa</strong>, los perros. Sobre un tablero de 38 puntos, el puma
+    avanza un paso por turno y salta sobre los perros para
+    <strong>capturarlos</strong>. Gana al hacer seis capturas o al dejar a los
+    perros sin jugada; los perros ganan al <strong>acorralar al puma</strong>.</p>
   </div>
 </main>
 <script>

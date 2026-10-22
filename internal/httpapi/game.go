@@ -365,5 +365,9 @@ func (s *Server) handleSubmitMove(w http.ResponseWriter, r *http.Request) {
 		s.writeError(w, err)
 		return
 	}
+	// The move is in the database: tell the pages of the room, so the other
+	// player sees it without asking.
+	s.hub.publish(room.ID)
+
 	s.writeJSON(w, http.StatusOK, s.summarize(r, room, player.ID))
 }

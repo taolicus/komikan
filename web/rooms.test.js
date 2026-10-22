@@ -174,6 +174,26 @@ const PANGUI_MOVES = [
 
 // ---- the page under test ---------------------------------------------
 
+// FakeEventSource is the stream the page opens for a room. The test keeps the
+// instances, so it can push an event the way the server would.
+class FakeEventSource {
+  constructor(url) {
+    this.url = url;
+    this.readyState = FakeEventSource.OPEN;
+    this.onmessage = null;
+    this.onerror = null;
+    FakeEventSource.instances.push(this);
+  }
+
+  close() {
+    this.readyState = FakeEventSource.CLOSED;
+  }
+}
+FakeEventSource.CONNECTING = 0;
+FakeEventSource.OPEN = 1;
+FakeEventSource.CLOSED = 2;
+FakeEventSource.instances = [];
+
 // summary builds the room the server would send to a player.
 function summary(role, legalMoves) {
   const other = role === "PANGUI" ? "TREWA" : "PANGUI";
@@ -191,7 +211,7 @@ function summary(role, legalMoves) {
       turnNumber: 3,
       currentPlayer: role,
       capturedTrewa: 0,
-      captureThreshold: 6,
+      captureThreshold: 8,
       position: PIECES,
       captureSequenceActive: false,
     },
@@ -222,14 +242,21 @@ function loadPage(data) {
     href: "https://example.test/rooms/testroom",
   };
   const navigator = {clipboard: {writeText: async () => {}}};
-  // The page polls the server every two seconds; the test does not.
-  const setInterval = () => 0;
+  // The page listens for the room instead of asking for it; the test pushes
+  // the events itself.
+  FakeEventSource.instances = [];
+  const EventSource = FakeEventSource;
+  const intervals = [];
+  const setInterval = (fn, ms) => {
+    intervals.push(ms);
+    return intervals.length;
+  };
 
   const source = fs.readFileSync(PAGE, "utf8");
   const script = extractScript(source);
   eval(script);
 
-  return {document, calls};
+  return {document, calls, streams: FakeEventSource.instances, intervals};
 }
 
 // loadListPage runs the script of the room page as the list of rooms, the
@@ -383,4 +410,92 @@ test("a room of the list waits for the identity of the browser", async () => {
   assert.strictEqual(posts.length, 1);
   assert.strictEqual(posts[0].path, "/api/rooms");
   assert.strictEqual(posts[0].headers["X-CSRF-Token"], "test-token");
+});
+
+test("the room is pushed instead of polled", async () => {
+  const page = loadPage(summary("TREWA", TREWA_MOVES));
+  await tick();
+
+  // The page asks once for the room it opened, and then listens.
+  assert.deepStrictEqual(page.calls.map((call) => call.path), ["/api/rooms/testroom"]);
+  assert.strictEqual(page.intervals.length, 0, "the page does not poll");
+
+  assert.strictEqual(page.streams.length, 1);
+  assert.strictEqual(page.streams[0].url, "/api/rooms/testroom/events");
+
+  // The opponent moves: the server pushes the room to the page.
+  const moved = summary("TREWA", TREWA_MOVES);
+  moved.game.version = 4;
+  moved.game.currentPlayer = "PANGUI";
+  page.streams[0].onmessage({data: JSON.stringify(moved)});
+  await tick();
+
+  assert.strictEqual(
+    page.document.getElementById("room-status").textContent,
+    "Turno de Pangui 🐆"
+  );
+  assert.strictEqual(page.streams.length, 1, "the page keeps one stream");
+});
+
+test("a page that loses the stream goes back to asking", async () => {
+  const page = loadPage(summary("TREWA", TREWA_MOVES));
+  await tick();
+
+  const stream = page.streams[0];
+  stream.readyState = FakeEventSource.CLOSED;
+  stream.onerror();
+
+  assert.deepStrictEqual(page.intervals, [5000]);
+});
+
+test("the puma may end a capture chain from the page", async () => {
+  const data = summary("PANGUI", [
+    {from: 7, to: 11, type: "CAPTURE", capturedNode: 6},
+    {from: 7, to: 7, type: "END_TURN"},
+  ]);
+  data.game.captureSequenceActive = true;
+  const page = loadPage(data);
+  await tick();
+
+  const row = page.document.getElementById("end-turn-row");
+  assert.strictEqual(row.classList.contains("hidden"), false);
+
+  for (const handler of page.document.getElementById("end-turn").listeners.click) handler();
+  await tick();
+
+  const sent = moveRequests(page.calls);
+  assert.strictEqual(sent.length, 1);
+  assert.deepStrictEqual(sent[0].body, {from: 7, to: 7, version: 3});
+});
+
+test("ending a chain is only offered while one runs", async () => {
+  const page = loadPage(summary("PANGUI", PANGUI_MOVES));
+  await tick();
+
+  const row = page.document.getElementById("end-turn-row");
+  assert.strictEqual(row.classList.contains("hidden"), true);
+});
+
+test("the end of a chain is a button, not a point of the board", async () => {
+  const data = summary("PANGUI", [
+    {from: 7, to: 7, type: "END_TURN"},
+    {from: 7, to: 11, type: "NORMAL"},
+  ]);
+  data.game.captureSequenceActive = true;
+  const page = loadPage(data);
+  await tick();
+
+  clickNode(page.document, 7); // pick the puma
+
+  // Its own point is not drawn as somewhere to move to.
+  const node = NODES.find(([id]) => id === 7);
+  const cx = MARGIN + node[1] * CELL;
+  const cy = MARGIN + node[2] * CELL;
+  const targets = page.document.registry.filter(
+    (element) =>
+      (element.attributes.class === "target" || element.attributes.class === "target-capture") &&
+      Number(element.attributes.cx) === cx &&
+      Number(element.attributes.cy) === cy
+  );
+  assert.strictEqual(targets.length, 0);
 });

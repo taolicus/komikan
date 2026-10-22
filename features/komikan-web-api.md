@@ -51,6 +51,7 @@ is identified, how rooms work, and what the endpoints answer.
 | POST | `/api/rooms/{roomID}/join` | take the free seat, or restore the seat |
 | GET | `/api/rooms` | the rooms the identity is seated in |
 | GET | `/api/rooms/{roomID}` | the room summary, for a seat holder |
+| GET | `/api/rooms/{roomID}/events` | the room summary, pushed whenever the room changes |
 | POST | `/api/rooms/{roomID}/moves` | play a move, returns the new summary |
 | GET | `/api/rooms/{roomID}/board` | the board of the room as `image/svg+xml` |
 
@@ -87,6 +88,32 @@ The summary carries the board topology (38 nodes with their coordinates and
 plays on. It also carries the legal moves, but only for the seat holder
 whose turn it is.
 
+## Live updates
+
+`GET /api/rooms/{roomID}/events` is a Server-Sent Events stream, open to a
+seat holder only. It sends the room summary as one `data:` line whenever the
+room changes, and it sends it once as soon as the client connects, so a page
+needs no second request to fill itself in.
+
+- The event is a signal, not a copy of the move: `internal/httpapi/events.go`
+  keeps an in-process hub per room, and each listener re-reads the room and
+  renders it for its own player. The hub lives in the process, which is
+  correct while the service is one process against one SQLite file.
+- `POST /join` and `POST /moves` publish after they commit, so the other
+  player is told about the move or about the game starting.
+- An idle stream gets a `: ping` comment every 25 seconds. The response sets
+  `X-Accel-Buffering: no`, which is what stops nginx from holding the events
+  back.
+- Shutdown cancels the base context of the HTTP server, so the streams end
+  and `Server.Shutdown` does not wait out its timeout on an open page.
+- The room page opens one `EventSource` and keeps it. If the browser has no
+  `EventSource`, or the stream ends for good, the page falls back to asking
+  every five seconds; that is a degraded mode, not the normal path.
+
+The tests are `internal/httpapi/events_test.go` (a stream gets the room at
+once, a move and a join are pushed, a stranger is refused) and
+`web/rooms.test.js` (the page opens one stream and does not poll).
+
 ## The two pages
 
 `web/index.html` is the home page and `web/rooms.html` is the page of a
@@ -102,12 +129,14 @@ room; both are plain scripts in static files, embedded in the binary.
 - The list of rooms at `/rooms/` is the same page script in its other shape:
   it reads the list, and its "Crear sala" button waits for that read for the
   same reason.
-- The room page reads the room (`GET /api/rooms/{roomID}`), draws the board,
-  and plays the moves (`POST /api/rooms/{roomID}/moves`). While the room
-  waits for the second player it shows the link of the room, with a field
-  holding the whole URL, a share button (only where the browser has the
-  share API) and a copy button. Once the second player has joined, the link
-  is gone: the game is on.
+- The room page reads the room once (`GET /api/rooms/{roomID}`), draws the
+  board, opens the event stream, and plays the moves
+  (`POST /api/rooms/{roomID}/moves`). It does not poll: a change of the other
+  player arrives as an event. While the room waits for the second player it
+  shows the link of the room, with a field holding the whole URL, a share
+  button (only where the browser has the share API) and a copy button. Once
+  the second player has joined, the link is gone: the game is on, and the
+  waiting page learns it from the stream.
 
 ## What a click means
 
@@ -119,6 +148,11 @@ The picked piece decides which move a point means. With the twelve dogs the
 same point is often reachable by more than one of them, and the move that is
 played has to be the one of the picked dog. A click on a point the picked
 piece cannot reach plays nothing.
+
+A capture chain is not compulsory, so the page has a "Terminar la captura"
+button while one is running. It plays the `END_TURN` move, whose `from` and
+`to` are both the Pangui's node; the button is used instead of the board
+because the Pangui's own point is also how a move is picked.
 
 ## The tests of the pages
 

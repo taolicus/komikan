@@ -241,6 +241,9 @@
     <div class="board" id="room-board"></div>
     <p class="status" id="room-status"></p>
     <div class="score" id="score"></div>
+    <div class="actions hidden" id="end-turn-row">
+      <button id="end-turn">Terminar la captura</button>
+    </div>
     <p class="note" id="room-note"></p>
     <p class="actions"><a class="link-button" href="/">Volver al inicio</a></p>
   </section>
@@ -265,6 +268,9 @@
   let selected = null;
   let busy = false;
   let listReady = null;
+  let stream = null;
+  let fallbackTimer = null;
+  let streamGivenUp = false;
 
   const csrf = () => {
     const match = document.cookie.match(/(?:^|;\s*)komikan_csrf=([^;]*)/);
@@ -353,7 +359,11 @@
 
     const position = (room.game && room.game.position) || {};
     const last = room.game && room.game.lastMove;
-    const selectedMoves = selected === null ? [] : movesFrom(selected);
+    // Ending a capture chain uses the Pangui's own point as both ends of the
+    // move, so it is not a destination to draw.
+    const selectedMoves = selected === null
+      ? []
+      : movesFrom(selected).filter((move) => move.type !== "END_TURN");
 
     for (const node of board.nodes) {
       const p = place(node);
@@ -454,8 +464,8 @@
   // ---- views ----------------------------------------------------------
 
   function renderRoom(data) {
-    // The poll redraws the board every couple of seconds. The piece the
-    // player picked stays picked as long as the game has not moved on.
+    // The server pushes the room whenever it changes. The piece the player
+    // picked stays picked as long as the game has not moved on.
     const previous = room && room.game ? room.game.version : null;
     room = data;
     board = data.board;
@@ -481,6 +491,7 @@
       return;
     }
     el("join-row").classList.add("hidden");
+    listen();
 
     if (game.status === "PANGUI_WON") {
       status.textContent = "Gana el Pangui 🐆";
@@ -497,12 +508,57 @@
     }
 
     const captured = game.capturedTrewa || 0;
-    const threshold = game.captureThreshold || 6;
+    const threshold = game.captureThreshold || 8;
     el("score").innerHTML =
       "<span>Pangui <b>" + captured + "</b> / " + threshold + "</span>" +
       "<span>Trewa <b>" + (12 - captured) + "</b> / 12</span>";
 
+    // A capture chain is not compulsory: while one is running, the Pangui
+    // may end it from here.
+    const endTurn = (data.legalMoves || []).some((move) => move.type === "END_TURN");
+    el("end-turn-row").classList.toggle("hidden", !endTurn);
+
     draw();
+  }
+
+  // ---- live updates ---------------------------------------------------
+
+  // The room is pushed by the server, so the page does not ask for it over
+  // and over. A browser that cannot keep a stream open asks instead, so the
+  // board still follows the game, just later.
+  function listen() {
+    if (!roomID || stream || streamGivenUp) return;
+    if (typeof EventSource === "undefined") {
+      // An old browser cannot keep a stream open at all.
+      startFallback();
+      return;
+    }
+    stream = new EventSource("/api/rooms/" + encodeURIComponent(roomID) + "/events");
+    stream.onmessage = (event) => {
+      let data = null;
+      try {
+        data = JSON.parse(event.data);
+      } catch (err) {
+        return; // The next event carries the state again.
+      }
+      if (data && data.id) renderRoom(data);
+    };
+    stream.onerror = () => {
+      // EventSource reconnects on its own while the connection is not
+      // refused. Once it gives up, the page goes back to asking.
+      if (stream && stream.readyState === EventSource.CLOSED) {
+        stream = null;
+        streamGivenUp = true;
+        startFallback();
+      }
+    };
+  }
+
+  function startFallback() {
+    if (fallbackTimer) return;
+    fallbackTimer = setInterval(() => {
+      if (!busy) refresh();
+    }, 5000);
   }
 
   async function refresh() {
@@ -567,6 +623,14 @@
     }
   });
 
+  el("end-turn").addEventListener("click", () => {
+    if (busy || !room) return;
+    const move = (room.legalMoves || []).find((m) => m.type === "END_TURN");
+    if (!move) return;
+    selected = null;
+    submit(move);
+  });
+
   el("copy").addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(roomURL());
@@ -611,9 +675,6 @@
   }
 
   start();
-  setInterval(() => {
-    if (roomID && !busy) refresh();
-  }, 2000);
 })();
 </script>
 </body>

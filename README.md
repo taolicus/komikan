@@ -28,8 +28,8 @@ small board, and a decision that cannot be taken back.
 | **Pieces** | 1 Pangui (puma), 12 Pu Trewa (dogs) |
 | **Turns** | The Pangui moves first, then the players alternate |
 | **Movement** | One segment along the lines of the board, in any direction, to an empty point |
-| **Capture** | Only the Pangui captures, by jumping over a Trewa. A capture is never forced: the puma may step on instead. Consecutive captures are allowed and count as one turn. |
-| **Victory** | The Pangui wins by capturing six Trewa. The Trewa win by leaving the Pangui with no legal move. |
+| **Capture** | Only the Pangui captures, by jumping over a Trewa. A capture is never forced: the puma may step on instead. Consecutive captures are allowed and count as one turn, and the puma may stop the chain when it likes. |
+| **Victory** | The Pangui wins by capturing eight Trewa. The Trewa win by leaving the Pangui with no legal move. If the Trewa are left with no legal move, the game is a draw. |
 
 The game exists in several regional and historical variants — the shape of the
 triangle, the capture threshold and the movement restrictions all differ
@@ -88,6 +88,8 @@ What exists today:
   and victory, all driven by a configurable ruleset;
 - moves over HTTP, decided by the server, and a board in the browser drawn
   from the same graph the rules engine plays on;
+- live updates: the page of a room is told when the other player moves or
+  joins, so it does not poll the server;
 - a test suite that plays whole games through the API, restarts the service
   against the same database file, and proves that two moves submitted at the
   same moment leave exactly one of them standing;
@@ -95,13 +97,13 @@ What exists today:
   dog that moves;
 - the service on the VPS, with a runbook for backups, restarts and health.
 
-Next: the remaining interface work, the hardening of the public endpoint,
-and the answer to the open rule questions.
+Next: the hardening of the public endpoint, scheduled backups, and the
+smaller interface work tracked in `tasks/open/`.
 
-Some rules are still open questions and are tracked in `issues/`. They are
-proposals, not settled history: the game plays with them today, and the
-values live in one struct (`rules.DefaultRuleset()`), so an answer is a
-change of values rather than a change of the engine.
+The rules are settled: they are listed in `features/komikan-rules.md`, with
+the decisions behind them. They still live in one struct
+(`rules.DefaultRuleset()`), so play-testing can change a value without
+touching the engine.
 
 ## Development
 

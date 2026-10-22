@@ -79,6 +79,10 @@ func (s *Server) handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// The player who was waiting is looking at the room: tell its page that
+	// the seat is taken.
+	s.hub.publish(room.ID)
+
 	s.writeJSON(w, http.StatusOK, s.summarize(r, room, player.ID))
 }
 

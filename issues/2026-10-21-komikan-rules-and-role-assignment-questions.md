@@ -13,17 +13,25 @@ that assignment, so the API and UI cannot be specified without it.
 
 ## Part 1: rule defaults to confirm
 
-| Setting | Value in the docs | Proposed default | Note |
-|---------|--------------------|------------------|------|
-| `panguiCapturesToWin` | 6 | 6 | Matches the usual "capture six prey" account. |
+**Answered on 2026-10-22.** The values are the ones in
+`features/komikan-rules.md`; this table records only what changed against the
+proposals.
+
+| Setting | Proposed | Answer | Note |
+|---|---|---|---|
+| `panguiCapturesToWin` | 6 | **8** | Raised to give the dogs room. A design choice, not a measured balance result; see the playout note in the rules feature document. |
 | `allowMultipleCaptures` | true | true | Chain of jumps in one turn. |
-| `multipleCapturesMandatory` | true | true | Once a capture is made, continue if possible. |
-| `trewaCanMoveBackward` | true | true | Trewa may move along any edge, not only toward the Pangui. Some accounts give the prey a forward-only movement; worth a second look. |
+| `multipleCapturesMandatory` | true | **false** | A chain may be stopped at any point. The puma keeps the turn after a jump, but it may end it instead of jumping again. |
+| `trewaCanMoveBackward` | true | true | Trewa may move along any edge, not only toward the Pangui. |
 | `panguiMovesFirst` | true | true | |
 | `puTrewaWinByBlocking` | true | true | Pangui with no legal move loses. |
 | `puTrewaWinByOccupyingTriangle` | false | false | Disabled until a layout with a defined "triangle area" exists. |
-| Capture preferred over normal move | not stated | **false** | See the capture geometry issue. |
-| No-legal-move-for-Trewa | not stated | draw | See the capture geometry issue. |
+| Capture preferred over normal move | false | **false** | The puma is not made to eat. |
+| No-legal-move-for-Trewa | draw | **draw** | `DRAW` is a game status. |
+
+The changed values have tests: `TestPanguiMayDeclineACapture`,
+`TestPanguiMayEndACaptureChain`, and the threshold in
+`internal/httpapi/rooms_test.go`.
 
 ## Part 2: role assignment (missing from the specs)
 
@@ -47,28 +55,24 @@ the room API.
 
 ## Part 3: scope questions the specs leave open
 
-1. **Reset / rematch inside a room.** `docs/overview.md` asks the UI to
-   support "restarting a game with the same or a different ruleset". In a
-   two-player room that needs agreement from both players, or it lets one
-   player destroy the other's game. Not in the MVP unless you want it.
-   Proposed default: **out of MVP scope**; the MVP has one game per room,
-   and a finished room stays finished.
-2. **Ruleset per room.** Should a room store its ruleset so future variants
-   can be played? Proposed default: **yes, store it, but every room starts
-   from the same default ruleset** — cheap to add now, avoids a schema change
-   later.
-3. **Move history in the MVP.** `docs/spec.md` requires move history to be
-   persisted. Proposed default: **persist it** (it is needed for the
-   authoritative state and for debugging) but **do not display it in the UI**
-   in the MVP.
-4. **Draw status.** See the capture geometry issue; a `DRAW` game status is
-   needed if a draw is reachable.
+**Answered on 2026-10-22.** Of the four, only live updates were picked to be
+worked on now; that work is done (`/api/rooms/{roomID}/events`, see
+`features/komikan-web-api.md`).
+
+1. **Reset / rematch inside a room.** Out of scope: one game per room, and a
+   finished room stays finished.
+2. **Ruleset per room.** Stored with the room (the schema has the column) but
+   every room starts from the same default ruleset. The engine still plays
+   the server's ruleset, not the stored copy, so a rule change applies to
+   games in progress.
+3. **Move history in the MVP.** Persisted and used for the authoritative
+   state, not displayed in the UI.
+4. **Draw status.** `DRAW` exists and is reachable.
 
 ## Next step
 
-Confirm or change the defaults in Part 1, pick (a)/(b)/(c) in Part 2, and
-confirm the Part 3 scope calls. The rules engine, room, and API tasks read
-these decisions.
+Nothing here is waiting on an answer. Reopen only if a rule needs to change
+after play-testing.
 
 **Update 2026-10-21:** Part 2 is answered (c). Part 1 is still open: the
 rules engine task was deferred, so the defaults stand as proposals until
@@ -81,9 +85,11 @@ while the answers are still open. Every value in Part 1 is a field of
 an answer means changing one struct, not the engine. The rules are written
 up in `features/komikan-rules.md`.
 
-**Update 2026-10-22:** one Part 1 value is answered. The puma is not forced
-to capture: `CapturePreferred` is off, so a capture on offer leaves the
-normal moves legal. The rest of Part 1 is still open. The change also
-lengthened the games: with random play the average went from about 73
-moves to about 153, and the dogs blocked the puma in one game out of 200
-where they never managed it before.
+**Update 2026-10-22:** every question is answered. The puma is not forced to
+capture (`CapturePreferred` off), a chain of jumps may be stopped
+(`MultipleCapturesMandatory` off), and the threshold is 8. The page offers a
+"Terminar la captura" button while a chain is running. Playouts show that
+raising the threshold lengthened the games (about 153 to 220 random moves)
+and, in the only measurement available, did not produce a dog win: random
+dogs never coordinate, so the balance has to be judged in real play. The
+issue is closed.

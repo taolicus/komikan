@@ -21,8 +21,9 @@ What is already there, in `web/rooms.html`:
 - the board drawn in the browser as SVG from the topology the server sends,
   with the puma and the dogs drawn distinctly, the last move marked, and the
   legal destinations highlighted when a piece is picked;
-- clicking a destination submits the move, and the board is refreshed by
-  polling every two seconds.
+- clicking a destination submits the move; the other player's move is
+  pushed to the page over a Server-Sent Events stream, so the page does not
+  poll.
 
 And in `web/index.html`, the home page:
 
@@ -40,21 +41,24 @@ home page.
 
 What is still to do:
 
-- the phone layout was never looked at by a person; the widths, the touch
-  targets and the scroll on a narrow screen need a real look;
-- the room page polls every two seconds even when the tab is in the
-  background, and it rebuilds the whole board on every poll. A tap that
-  lands while the board is being replaced can be lost, and a hidden tab
-  keeps asking the server for something nobody is looking at. The client
-  decision in `issues/2026-10-21-komikan-client-architecture-choices.md`
-  says the polling happens while the page is visible;
-- the waiting view (only one seat taken) is still plain: the share field is
-  there, but there is no indication that the second player has arrived beyond
-  the status line;
+- ~~the phone layout was never looked at by a person~~ — **checked by the
+  owner on 2026-10-22: the phone layout is fine.**
+- ~~the room page polls every two seconds and rebuilds the whole board on
+  every poll~~ — **done on 2026-10-22:** the room is pushed over
+  `GET /api/rooms/{roomID}/events`, the page keeps one `EventSource`, and a
+  fallback poll only runs if the browser cannot keep a stream. The board is
+  still redrawn on each update, but an update now only happens when the room
+  actually changed.
+- ~~the waiting view is plain~~ — with live updates, the share field
+  disappears and the board starts as soon as the second player joins.
 - the game page has no move history, no captured pieces shown on the board,
   and no way to see the opponent's last move other than the marked node;
 - the home page lists the games of the browser, but it does not say who the
   opponent is, and it does not refresh while it stays open.
+
+The last two are deliberately out of scope for this round: on 2026-10-22 the
+owner picked live updates as the only interface item to address now. The rest
+stays parked here.
 
 ## Outcome
 
@@ -84,7 +88,8 @@ accepts moves, shows whose turn it is, and reports the result.
     message;
   - indicators for the current player, whose seat you are, the number of
     captured Trewa against the threshold, and the winner when the game ends;
-  - opponent moves are picked up by polling (per the client decision).
+  - opponent moves are pushed over the room's event stream (per the
+    live-update task), with a poll only as a fallback.
 - The interface is usable on a phone screen as well as a desktop.
 - The room page works from a page reload and from a fresh browser with the
   same identity.
@@ -101,7 +106,8 @@ accepts moves, shows whose turn it is, and reports the result.
   is, shows the captured count against the threshold, and shows the winner at
   game end.
 - Reloading the page restores the current position and turn from the server.
-- The layout is usable at a narrow viewport (phone) and a wide one.
+- The layout is usable at a narrow viewport (phone) and a wide one. Checked
+  by the owner on a phone on 2026-10-22.
 - The coming-soon page is no longer served at `/`.
 
 ## Verification

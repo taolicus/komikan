@@ -1,5 +1,11 @@
 # Komikan — Game Rules and Implementation Specification
 
+Status: implemented. This document describes the variant the site plays and
+has been checked against the code. The authoritative implementation notes are
+in `features/` (`komikan-rules.md`, `komikan-board-layout.md`,
+`komikan-web-api.md`); where this document is vaguer than the code, the code
+and those notes win.
+
 ## 1. Overview
 
 Komikan is a traditional Mapuche abstract strategy board game for two players. One player controls a Pangui (puma); the other controls twelve Pu Trewa (dogs).
@@ -136,13 +142,19 @@ The default variant allows consecutive captures during one Pangui turn.
 After a capture:
 
 1. Recalculate all legal captures from the Pangui's new position.
-2. If another capture is available, apply the selected continuation rule.
+2. If another capture is available, offer it together with the end of the
+   turn: continuing is allowed, not required.
 3. Each jump removes exactly one Trewa.
-4. End the turn when no further capture is available, or when stopping is permitted and the player chooses to stop.
+4. End the turn when no further capture is available, or when the player
+   chooses to stop.
 
-For a deterministic default implementation, make additional captures mandatory whenever available. This behavior must remain configurable because historical rules vary.
+A multiple-capture sequence counts as one turn. While a sequence is open, the
+turn stays with the Pangui; it ends either by another jump or by an explicit
+end-turn move.
 
-A multiple-capture sequence counts as one turn. Do not switch players while a mandatory capture remains available.
+Continuation is configurable (`multipleCapturesMandatory` in the ruleset).
+The variant the site plays does not force it: a chain may be stopped at any
+point.
 
 ## 8. Pu Trewa Strategy and Restrictions
 
@@ -165,7 +177,7 @@ The game ends immediately when a configured victory condition is satisfied.
 
 ### Pangui Victory
 
-The default configuration declares the Pangui the winner after capturing six Trewa.
+The default configuration declares the Pangui the winner after capturing eight Trewa.
 
 Make the capture threshold configurable because published versions use different thresholds.
 
@@ -182,12 +194,19 @@ The Pangui loses if neither type of move is available.
 
 Some variants allow the Pu Trewa to win by occupying every designated node in the triangular area. This condition should be optional and enabled only when supported by the selected board layout and ruleset.
 
+### Draw
+
+When the Trewa player has no legal move and the Pangui has not reached its
+capture threshold, the game is a draw. This is the `drawWhenTrewaCannotMove`
+rule; it is enabled in the variant the site plays and produces the `DRAW`
+game status.
+
 ### Terminal State
 
-Once the game is won:
+Once the game is won or drawn:
 
 - Reject all additional moves.
-- Record the winning player.
+- Record the winning player, when there is one.
 - Preserve the final board position for review or replay.
 
 ## 10. Legal Move Generation
@@ -257,22 +276,25 @@ A game-state object should include:
 - `capturedTrewa`
 - `turnNumber`
 - `captureSequenceActive`
-- `mandatoryCaptureContinuation`
-- `gameStatus` (`IN_PROGRESS`, `PANGUI_WON`, `PU_TREWA_WON`)
+- `gameStatus` (`IN_PROGRESS`, `PANGUI_WON`, `PU_TREWA_WON`, `DRAW`)
 - `ruleset`
 - `moveHistory`
 
 The `position` maps node IDs to pieces. Empty nodes may be represented by absent map entries or explicit `EMPTY` values, provided the implementation uses one convention consistently.
 
-The ruleset should include:
+The ruleset includes these values. They are the ones the site plays; every
+one is a field of `rules.Ruleset`.
 
-- `panguiCapturesToWin`: default `6`
-- `allowMultipleCaptures`: default `true`
-- `multipleCapturesMandatory`: default `true`
-- `trewaCanMoveBackward`: default `true`
-- `panguiMovesFirst`: default `true`
-- `puTrewaWinByBlocking`: default `true`
-- `puTrewaWinByOccupyingTriangle`: default `false`
+- `panguiCapturesToWin`: `8`
+- `allowMultipleCaptures`: `true`
+- `multipleCapturesMandatory`: `false`
+- `trewaCanMoveBackward`: `true`
+- `panguiMovesFirst`: `true`
+- `puTrewaWinByBlocking`: `true`
+- `puTrewaWinByOccupyingTriangle`: `false`
+- `capturePreferred`: `false`
+- `drawWhenTrewaCannotMove`: `true`
+- `thresholdBeforeBlocking`: `true`
 
 Validate that all configured values are compatible with the loaded board layout.
 
@@ -289,7 +311,11 @@ The interface should:
 - Display the number of captured Trewa and the configured capture threshold.
 - Prevent interaction with occupied or invalid destinations.
 - Display the winner when the game ends.
-- Support restarting a game with the same or a different ruleset.
+- Update the board when the other player moves, without the page asking for
+  it over and over.
+
+Restarting a game with the same or a different ruleset is out of scope: a
+room holds one game, and a finished room stays finished.
 
 The visual board must accurately represent the graph used by the rules engine. Every displayed connection must correspond to an edge in the graph, and every graph edge must be represented visually.
 
@@ -310,7 +336,8 @@ At minimum, test the following cases:
 11. A Pangui jump is rejected if the landing node is occupied.
 12. A Pangui jump is rejected if the required connections or capture pattern do not exist.
 13. Consecutive captures update the position and counter correctly.
-14. A mandatory capture sequence does not prematurely switch players.
+14. A capture sequence that is still open keeps the turn with the Pangui, and
+    ending it passes the turn.
 15. The Pangui wins when its configured capture threshold is reached.
 16. The Pu Trewa win when the Pangui has no legal normal moves or captures.
 17. Optional triangle-occupation victory works only when enabled.
@@ -318,6 +345,8 @@ At minimum, test the following cases:
 19. No moves can be made after the game ends.
 20. Every generated legal move can be applied successfully.
 21. Every applied move satisfies board-topology and occupancy constraints.
+22. A draw is produced when the Trewa have no legal move and the threshold
+    has not been reached.
 
 ## 15. Implementation Caveat
 

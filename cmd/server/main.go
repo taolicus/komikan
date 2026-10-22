@@ -10,6 +10,7 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -67,10 +68,16 @@ func run() error {
 		return err
 	}
 
+	baseCtx, cancelBase := context.WithCancel(context.Background())
+	defer cancelBase()
+
 	srv := &http.Server{
 		Addr:              *addr,
 		Handler:           api.Handler(),
 		ReadHeaderTimeout: 10 * time.Second,
+		// The request contexts of the room event streams derive from this
+		// one, so cancelling it on shutdown closes them.
+		BaseContext: func(net.Listener) context.Context { return baseCtx },
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -93,6 +100,9 @@ func run() error {
 	}
 
 	logger.Info("komikan: shutting down")
+	// The event streams of the open pages never end on their own, and
+	// Shutdown waits for the requests in flight: end them first.
+	cancelBase()
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(shutdownCtx); err != nil {

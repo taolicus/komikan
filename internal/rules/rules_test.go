@@ -321,6 +321,56 @@ func TestPanguiMayDeclineACapture(t *testing.T) {
 	}
 }
 
+func TestPanguiMayEndACaptureChain(t *testing.T) {
+	engine := testEngine(t)
+	state := stateWith(map[board.NodeID]board.Piece{
+		20: board.PiecePangui,
+		19: board.PieceTrewa,
+		23: board.PieceTrewa,
+	}, PlayerPangui)
+
+	first, err := engine.ApplyMove(state, Move{
+		Player: PlayerPangui, From: 20, To: 18, Type: MoveCapture, CapturedNode: 19,
+	})
+	if err != nil {
+		t.Fatalf("ApplyMove(): %v", err)
+	}
+	if !first.CaptureSequenceActive {
+		t.Fatal("the capture sequence should still be active")
+	}
+
+	// Both the continuation and the end of the turn are offered: the chain
+	// is not compulsory.
+	moves := engine.LegalMoves(first, PlayerPangui)
+	if !hasMove(moves, 18, 28, MoveCapture) {
+		t.Errorf("the continuation is missing: %v", moves)
+	}
+	var endTurn *Move
+	for i := range moves {
+		if moves[i].Type == MoveEndTurn {
+			endTurn = &moves[i]
+			break
+		}
+	}
+	if endTurn == nil {
+		t.Fatalf("ending the chain is not offered: %v", moves)
+	}
+
+	second, err := engine.ApplyMove(first, *endTurn)
+	if err != nil {
+		t.Fatalf("ApplyMove(end turn): %v", err)
+	}
+	if second.CurrentPlayer != PlayerTrewa {
+		t.Errorf("current player = %q, want the Trewa", second.CurrentPlayer)
+	}
+	if second.CapturedTrewa != 1 {
+		t.Errorf("captured = %d, want 1", second.CapturedTrewa)
+	}
+	if second.Position.At(18) != board.PiecePangui {
+		t.Error("ending the turn moved the Pangui")
+	}
+}
+
 func TestPanguiWinsAtTheThreshold(t *testing.T) {
 	b, _, err := board.Standard()
 	if err != nil {

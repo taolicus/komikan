@@ -93,3 +93,12 @@ server skeleton and the rooms task.
   board data instead.
 - (a) Two pages: `/rooms/` and `/rooms/{roomID}`, with the coming-soon page
   still at `/`.
+
+**Update 2026-10-22: section 3 is reversed.** The owner asked for live
+updates and specifically not for polling. The room page now keeps a
+Server-Sent Events stream open (`GET /api/rooms/{roomID}/events`) and gets
+the room pushed when the other player moves or joins; a five-second poll runs
+only in a browser that cannot keep a stream, or after a stream ends for good.
+The `proxy_buffering off` that (b) anticipated is not needed: the stream
+response carries `X-Accel-Buffering: no`, which turns buffering off for that
+response only. See `tasks/closed/2026-10-22-komikan-live-room-updates.md`.

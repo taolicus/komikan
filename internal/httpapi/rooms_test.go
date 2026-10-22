@@ -207,8 +207,8 @@ func TestCreateRoomSeatsTheCreator(t *testing.T) {
 	if room.Game.CurrentPlayer != string(rules.PlayerPangui) {
 		t.Errorf("current player = %q, want PANGUI", room.Game.CurrentPlayer)
 	}
-	if room.Game.Threshold != 6 {
-		t.Errorf("threshold = %d, want 6", room.Game.Threshold)
+	if room.Game.Threshold != 8 {
+		t.Errorf("threshold = %d, want 8", room.Game.Threshold)
 	}
 	if room.Board == nil || len(room.Board.Nodes) != 38 {
 		t.Errorf("the room does not carry the board topology")

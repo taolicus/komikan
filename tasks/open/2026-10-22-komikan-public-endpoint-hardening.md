@@ -51,7 +51,11 @@ Checked on 2026-10-22 against the running service and the code:
 - `http.MaxBytesReader` around every request body, with a limit that is
   generous for a move (a few kilobytes) and small enough to matter.
 - `ReadTimeout`, `WriteTimeout` and `IdleTimeout` on the server, so a slow
-  client cannot hold a connection open.
+  client cannot hold a connection open. `WriteTimeout` must not cut the
+  room event streams (`internal/httpapi/events.go`): either leave it at zero
+  and rely on `ReadTimeout` and `IdleTimeout`, or give the stream handler a
+  deadline of its own with `http.ResponseController`. `IdleTimeout` only
+  applies between requests, so it is safe for a stream.
 - A limit on room creation per identity, answered with `429 Too Many
   Requests`. The limit should be high enough for a real person (say a few
   dozen rooms) and low enough to stop a script.
@@ -69,7 +73,9 @@ Checked on 2026-10-22 against the running service and the code:
   play with the policy in place.
 - An identity that creates more rooms than the limit in a window gets
   `429`, and a normal player never reaches it.
-- A whole game still plays end to end on the public URL after the change.
+- A whole game still plays end to end on the public URL after the change,
+  including the event stream (a `Content-Security-Policy` needs
+  `connect-src 'self'` for it, and a `WriteTimeout` must not cut it).
 
 ## Verification
 

@@ -286,7 +286,7 @@ func playOut(t *testing.T, pair *playingPair) roomSummary {
 	t.Helper()
 	random := rand.New(rand.NewSource(20261021))
 
-	for step := 0; step < 400; step++ {
+	for step := 0; step < 2000; step++ {
 		overview := pair.roomFor(t, pair.pangui)
 		if overview.Game.Status != "IN_PROGRESS" {
 			return overview

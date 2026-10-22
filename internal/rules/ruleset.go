@@ -24,7 +24,7 @@ type Ruleset struct {
 	// AllowMultipleCaptures lets the Pangui chain captures in one turn.
 	AllowMultipleCaptures bool `json:"allowMultipleCaptures"`
 	// MultipleCapturesMandatory forces the Pangui to keep capturing while a
-	// capture is available.
+	// capture is available. With it off, the Pangui may end the chain.
 	MultipleCapturesMandatory bool `json:"multipleCapturesMandatory"`
 	// TrewaCanMoveBackward lets the Trewa move away from the triangle as
 	// well as towards it.
@@ -57,9 +57,9 @@ type Ruleset struct {
 // different answer changes this function and nothing else.
 func DefaultRuleset() Ruleset {
 	return Ruleset{
-		PanguiCapturesToWin:           6,
+		PanguiCapturesToWin:           8,
 		AllowMultipleCaptures:         true,
-		MultipleCapturesMandatory:     true,
+		MultipleCapturesMandatory:     false,
 		TrewaCanMoveBackward:          true,
 		PanguiMovesFirst:              true,
 		PuTrewaWinByBlocking:          true,

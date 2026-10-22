@@ -76,3 +76,53 @@ in git, so it is not even in the repository history yet.
 
 Review the three documents, then confirm the scope list above. The task
 sequence in `tasks/open/` implements the "in scope" list and stops there.
+
+## Resolution (2026-10-22)
+
+The documents were checked line by line against the code and corrected where
+they had drifted:
+
+- `docs/overview.md`: status line added; the capture-continuation rule now
+  says a chain may be stopped; the threshold is 8; a draw section defines the
+  `DRAW` status; the game state list and the ruleset defaults match
+  `rules.DefaultRuleset()`; "restart with the same or a different ruleset" is
+  marked out of scope.
+- `docs/spec.md`: status line added; the communication line says the room is
+  pushed over Server-Sent Events; the API section lists the endpoints that
+  exist, including `/events` and `/board`, and points at
+  `features/komikan-web-api.md` for the shapes; the future-extension list no
+  longer offers real-time updates as a future item; the missing request size
+  limit is called out as an open task instead of implying it exists.
+- `docs/board.md` already pointed at `features/komikan-board-layout.md`.
+
+The scope list is signed off, with one change: **live updates are in scope
+and are done** (`tasks/closed/2026-10-22-komikan-live-room-updates.md`). Push
+notifications while the page is closed stay out.
+
+The owner also confirmed on 2026-10-22 that the phone layout is fine, having
+looked at it. Gap 7 is stale: the site is live at
+<https://komikan.tequionet.org>, not the coming-soon page.
+
+This issue is closed. `docs/` describes the implemented system; `features/`
+remains the authoritative implementation record.
+
+## Scope list as signed off
+
+**In scope**
+
+- One ruleset (configurable in code, not user-selectable in the MVP).
+- Two-player rooms with browser-token identity, asynchronous play.
+- Persistent rooms and games across restarts.
+- Board rendering, move submission, server-side validation, win detection.
+- Live room updates over Server-Sent Events (added 2026-10-22).
+- Automated tests for rules, identity, rooms, persistence, concurrency.
+
+**Out of scope for the MVP**
+
+- Move history UI and replay (history is persisted, not displayed).
+- Player names.
+- Notifications while the page is closed.
+- Room expiry or archival.
+- In-memory database mode for local development.
+- Multiple concurrent rulesets chosen by the user.
+- Reset/rematch inside a room.

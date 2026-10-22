@@ -1,5 +1,10 @@
 # Komikan — Game Project Specification
 
+Status: implemented. The requirements below are what the live site does,
+except where a line names an open task. The implementation notes are in
+`features/` (`komikan-web-api.md`, `komikan-deployment-runbook.md`,
+`komikan-rules.md`).
+
 ## 1. Overview
 
 Komikan is a web-based implementation of the traditional Mapuche abstract strategy board game. The application allows two players to play against each other through a browser, with support for asynchronous turns and multiple independent game rooms.
@@ -19,7 +24,7 @@ The application is distributed as a single Go binary that embeds and serves its 
 ### Frontend
 - **Delivery:** Web interface embedded in the Go binary using `embed`.
 - **Client:** HTML, CSS, and JavaScript.
-- **Communication:** HTTP endpoints for room management and game actions. Server-Sent Events or polling may be used to notify clients of state changes.
+- **Communication:** HTTP endpoints for room management and game actions. A room page listens to a Server-Sent Events stream of its room, so a move of the other player arrives without the page asking; a browser without `EventSource` falls back to a slower poll.
 - **Rendering:** The board is rendered in the browser, with clear visual indications of pieces, valid moves, the current turn, and the game status.
 
 ### Architectural Principles
@@ -94,6 +99,7 @@ Requirements:
 - Players can leave the application and return later without losing their place in the game.
 - Returning players can retrieve the latest game state through their browser token identity and room URL.
 - The interface must clearly indicate whose turn it is and whether the opponent has moved.
+- A player who is looking at the room is told about the opponent's move while the page is open: the server pushes the new state through a Server-Sent Events stream, and the page does not poll for it.
 - The server must not make moves automatically on behalf of absent players.
 
 A player's absence does not cause a timeout, forfeiture, or automatic move unless such behavior is explicitly introduced as a separate game rule.
@@ -146,17 +152,21 @@ The interface must remain usable on desktop and mobile browsers.
 
 ## 9. HTTP API
 
-The backend should expose a small, versioned API for browser interactions.
-
-Suggested endpoints:
+The backend exposes a small API for browser interactions:
 
 - `POST /api/rooms` — create a room.
 - `GET /api/rooms/{roomID}` — retrieve room and game state.
+- `GET /api/rooms/{roomID}/events` — stream the room whenever it changes (Server-Sent Events; one JSON document per event, the same shape as the `GET`).
+- `GET /api/rooms/{roomID}/board` — the board topology on its own.
 - `POST /api/rooms/{roomID}/join` — take an available seat or restore an existing seat.
 - `POST /api/rooms/{roomID}/moves` — submit a move.
 - `GET /api/rooms` — list rooms associated with the authenticated browser identity.
+- `GET /healthz` — liveness, used by the deployment.
 
-The exact endpoint structure may change during implementation, but identity validation, room isolation, and server-side game validation are mandatory.
+Identity validation, room isolation, and server-side game validation are
+mandatory. The request and response shapes, the error codes, and the identity
+cookies are documented in `features/komikan-web-api.md`, which is kept in step
+with the code.
 
 Room pages must use a distinct shareable URL, such as `/rooms/{roomID}`.
 
@@ -169,7 +179,7 @@ Room pages must use a distinct shareable URL, such as `/rooms/{roomID}`.
 - Protect against unauthorized room access and seat impersonation.
 - Avoid exposing browser tokens in URLs, logs, or error messages.
 - Handle simultaneous requests safely.
-- Set reasonable request size limits and validate room identifiers.
+- Set reasonable request size limits and validate room identifiers. (The size limit is not enforced yet; it is tracked in `tasks/open/2026-10-22-komikan-public-endpoint-hardening.md`.)
 - Ensure that invalid requests do not partially mutate game state.
 - Provide clear errors without leaking sensitive implementation details.
 
@@ -187,6 +197,7 @@ The project must include automated tests for:
 - Asynchronous play across separate sessions.
 - Persistence and recovery after restarting the server.
 - Concurrent move submissions and stale game-state updates.
+- Live updates: a move and a join reach the other player's stream.
 - HTTP endpoint validation.
 
 Game rules should be tested independently of the HTTP server and browser interface.
@@ -198,11 +209,10 @@ The initial implementation should prioritize a reliable, complete two-player gam
 Potential future extensions include:
 - In-room move history and replay.
 - Optional player display names.
-- Notifications when an opponent makes a move.
+- Notifications when an opponent makes a move while the page is closed.
 - Room expiration and archival policies.
 - A local development mode with an in-memory database.
 - Administrative diagnostics and structured logging.
-- Optional real-time updates while both players are online.
 - Additional language support, including Mapuzugun terminology.
 
 Future features must not compromise the authoritative server-side game logic or the ability to resume asynchronous games.

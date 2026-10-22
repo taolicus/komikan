@@ -40,8 +40,8 @@ needed. The remaining questions still stand.
    Some accounts of the game describe a double jump. `docs/overview.md`
    assumes one jump captures exactly one Trewa.
 
-   Proposed default: **no** for MVP; captures only single Trewa, and the
-   mandatory-continuation rule chains separate single jumps.
+   **Answered on 2026-10-22: no.** A jump takes exactly one Trewa; a chain
+   of jumps is a chain of single jumps.
 
 3. **Must the Pangui capture when a capture is available?**
    The doc makes *continuation* after a capture mandatory, but does not say the
@@ -55,9 +55,13 @@ needed. The remaining questions still stand.
 
    **Answered on 2026-10-22: no.** The puma is not made to eat. A capture
    on offer does not make the normal moves illegal, and the player chooses.
-   `rules.DefaultRuleset()` has `CapturePreferred: false`. The rule that a
-   chain of jumps must be continued to the end is a different rule and is
-   unchanged: once the puma has jumped, it keeps jumping while it can.
+   `rules.DefaultRuleset()` has `CapturePreferred: false`.
+
+   Chain continuation was a separate question and is also answered: a chain
+   of jumps **may be stopped** at any point (`MultipleCapturesMandatory:
+   false`). Once the puma has jumped it keeps the turn, but it may end the
+   turn instead of jumping again. The page offers a "Terminar la captura"
+   button while a chain is running.
 
 4. **Does a capture require the jumped Trewa specifically?**
    Obviously it does in this game (the Trewa never captures), but the engine
@@ -66,13 +70,15 @@ needed. The remaining questions still stand.
    Proposed default: reject, with a distinct error reason for each case.
 
 5. **Which terminal conditions exist besides the two documented ones?**
-   - Pangui wins at the capture threshold (default 6).
+   - Pangui wins at the capture threshold (now 8, raised from 6 on
+     2026-10-22).
    - Pu Trewa win when the Pangui has no legal normal move and no capture.
    - Undefined in the docs: what happens when the Trewa player has no legal
      move at all? A draw? A Pangui win? Continuing play?
 
-   Proposed default: **draw** when the Trewa player has no legal move and the
-   Pangui has not reached its threshold. Game status gains a `DRAW` value.
+   **Answered on 2026-10-22: a draw.** Draw when the Trewa player has no
+   legal move and the Pangui has not reached its threshold. `DRAW` is a game
+   status.
 
 6. **Order of victory checks.**
    If the Pangui's last capture both reaches the threshold and leaves it
@@ -88,21 +94,19 @@ whatever is decided here; the values live in the `Ruleset` struct so a variant
 can differ without engine changes.
 
 **Update 2026-10-21:** the engine is written and shipped with the proposed
-defaults, so the game is playable. Nothing here is endorsed yet; the answers
-are still needed.
+defaults, so the game is playable.
+
+**Update 2026-10-22: closed.** Every question has an answer, and the code
+matches it.
 
 How each question landed in the code:
 
-| Question | Default | Where it lives |
+| Question | Answer | Where it lives |
 |---|---|---|
 | 1. straight line | (a) geometry | `internal/rules`: the node beyond the Trewa must be empty, and the Trewa must be the exact midpoint of the two nodes. One test for every direction, so no pattern table. |
 | 2. double jump | no | A jump always takes exactly one Trewa; a chain of jumps is a chain of single jumps. |
 | 3. must capture | **no** | `Ruleset.CapturePreferred` is off: a capture on offer does not make the normal moves illegal, so the puma may decline it. |
+| 3b. must continue a chain | **no** | `Ruleset.MultipleCapturesMandatory` is off: while a chain runs, `MoveEndTurn` is offered and ends the turn. |
 | 4. only a Trewa may be jumped | yes | The engine only jumps over a node holding a Trewa; an empty node or the Pangui is not a capture. |
 | 5. the Trewa are stuck | draw | `Ruleset.DrawWhenTrewaCannotMove`, and `Status` has a `DRAW` value. |
 | 6. order of the victory checks | threshold first | `Ruleset.ThresholdBeforeBlocking`. |
-
-Questions 1, 4, and 6 are already settled by the board and by the shape of
-the code. Question 3 is answered: the puma is not forced to capture.
-Questions 2 and 5 are the ones left that would change how the game feels,
-and each of them is a single field in `rules.DefaultRuleset()`.

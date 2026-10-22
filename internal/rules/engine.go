@@ -88,8 +88,9 @@ func (e *Engine) panguiMoves(state GameState) []Move {
 
 	captures := e.captureMoves(state, from)
 
-	// In the middle of a chain of captures, the puma may only continue
-	// capturing. When stopping is allowed, it may also end the turn.
+	// In the middle of a chain of captures, the puma keeps the turn. It may
+	// continue capturing, and when stopping is allowed it may also end the
+	// turn here.
 	if state.CaptureSequenceActive {
 		if e.ruleset.AllowMultipleCaptures && e.ruleset.MultipleCapturesMandatory {
 			return captures

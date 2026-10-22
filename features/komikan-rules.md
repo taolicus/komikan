@@ -24,9 +24,9 @@ next, err := engine.ApplyMove(state, moves[0])
 
 | Setting | Value | Note |
 |---|---|---|
-| `panguiCapturesToWin` | 6 | the usual "capture six prey" account |
+| `panguiCapturesToWin` | 8 | raised from 6 on 2026-10-22 to give the dogs room |
 | `allowMultipleCaptures` | true | the puma may chain jumps in one turn |
-| `multipleCapturesMandatory` | true | once a jump is made, it must continue if it can |
+| `multipleCapturesMandatory` | false | a chain may be ended at any point (answered 2026-10-22) |
 | `trewaCanMoveBackward` | true | the dogs may move along any edge |
 | `panguiMovesFirst` | true | |
 | `puTrewaWinByBlocking` | true | the puma with no legal move loses |
@@ -35,10 +35,9 @@ next, err := engine.ApplyMove(state, moves[0])
 | `drawWhenTrewaCannotMove` | true | the dogs with no legal move end the game in a draw |
 | `thresholdBeforeBlocking` | true | the capture that wins the game is not cancelled by the position it leaves |
 
-These are the defaults of the variant the site plays. `capturePreferred` is
-the one the user has answered; the rest are still proposals from the open
-rule issues. They all live in one struct, so a change is a change of
-values.
+Every value is now the answer of the owner of the game or a property of the
+board; none of them is a provisional proposal. They all live in one struct,
+so a change is a change of values.
 
 ## Capture geometry
 
@@ -64,10 +63,15 @@ jumps.
 - The puma is not made to hunt. A capture on offer does not make the normal
   moves illegal: the player chooses between them (`capturePreferred` is
   off).
-- After a jump, the puma keeps playing while another jump is available
-  (`captureSequenceActive`). The turn only ends when no jump is left.
-- A chain of jumps counts as one turn.
-- `MoveEndTurn` exists only for variants where stopping a chain is allowed.
+- After a jump, the puma may keep jumping while another jump is available,
+  but it is not obliged to (`multipleCapturesMandatory` is off). A capture
+  chain that is ended counts as one turn, like one that is played out.
+- `MoveEndTurn` is offered exactly while a capture chain is running. It has
+  `From == To` (the puma stays where it is) and the API accepts it like any
+  other move. The page shows it as a button rather than as a point of the
+  board, because the puma's own point is also how a move is picked.
+- While a chain runs, `captureSequenceActive` is true and the turn belongs to
+  the puma; it ends either by continuing or by `MoveEndTurn`.
 
 ## Victory
 
@@ -82,20 +86,31 @@ outside the engine.
 
 ## What the random playouts show
 
-200 games with random legal moves, with the puma free to decline a capture:
-every game ended, the average game ran about 153 moves, and the longest ran
-552. 199 of them ended with the puma reaching six captures, and one with the
-dogs blocking the puma.
+200 games with random legal moves under the current defaults (threshold 8,
+chains optional, the puma free to decline a capture): every game ended, the
+average game ran about 220 moves, and the longest ran 618. The puma won all
+200.
 
-Before the puma was freed from the forced capture the same playouts ran
-about 73 moves and the dogs never blocked the puma at all, because the puma
-was always hunting. The difference is a balance question, not an engine bug:
-the dogs have to be played, not wandered.
+The numbers under the older defaults, for comparison:
 
-## Still open
+| Defaults | Average | Longest | Puma wins |
+|---|---|---|---|
+| threshold 6, capture mandatory, chain mandatory | ~73 | — | 300/300 |
+| threshold 6, capture optional, chain mandatory | ~153 | 552 | 199/200 |
+| threshold 8, capture optional, chain optional | ~220 | 618 | 200/200 |
 
-`capturePreferred` was answered on 2026-10-22: the puma is not forced to
-capture. The other rule values are still proposals, and the user's answers
-are still to come (see
-`issues/2026-10-21-komikan-rules-and-role-assignment-questions.md` and
-`issues/2026-10-21-komikan-capture-geometry-uncertainty.md`).
+The single dog win at threshold 6 was noise: changing the rules changes the
+whole random trajectory, so one game in two hundred proves nothing. Random
+dogs never coordinate, and blocking the puma is exactly what needs
+coordination. Playouts can show that a rule set terminates and roughly how
+long a game runs; they cannot say whether the game is balanced. Only play
+between people can answer that, so the threshold is a design choice (the
+dogs now need the puma to get through eight of twelve), not a measured
+result.
+
+## Decisions
+
+Every rule question below was answered by the owner of the game on
+2026-10-22; the rules feature document is the record of the answers and the
+values in `rules.DefaultRuleset()` are the implementation. What remains is
+play-testing, not rule-setting.

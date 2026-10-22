@@ -32,8 +32,10 @@ Supporting facts:
   valle"), which this layout's initial position matches.
 - The rules in `docs/overview.md` agree with the same source: Pangi moves
   first, both sides move one segment along the board lines in any direction,
-  only the Pangi captures (by jumping over a Trewa), consecutive captures are
-  allowed, and the win conditions are six captures or immobilising the Pangi.
+  only the Pangi captures (by jumping over a Trewa), and consecutive captures
+  are allowed. That account puts the win at six captures or immobilising the
+  Pangi; the variant played here asks for eight (see
+  `features/komikan-rules.md`).
 
 `docs/board.md` remains the sketch this was read from. This file is the
 authoritative version of it.

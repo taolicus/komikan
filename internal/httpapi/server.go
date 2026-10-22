@@ -49,6 +49,7 @@ type Server struct {
 	roomsPage     []byte
 	version       string
 	store         store.Store
+	hub           *eventHub
 	mux           *http.ServeMux
 }
 
@@ -97,6 +98,7 @@ func New(cfg Config) (*Server, error) {
 		roomsPage:     roomsPage,
 		version:       cfg.Version,
 		store:         cfg.Store,
+		hub:           newEventHub(),
 		mux:           http.NewServeMux(),
 	}
 	s.routes()
@@ -117,6 +119,7 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("GET /api/rooms", s.withIdentity(s.handleListRooms))
 	s.mux.HandleFunc("GET /api/rooms/{roomID}", s.withIdentity(s.handleGetRoom))
 	s.mux.HandleFunc("GET /api/rooms/{roomID}/board", s.withIdentity(s.handleRoomBoard))
+	s.mux.HandleFunc("GET /api/rooms/{roomID}/events", s.withIdentity(s.handleRoomEvents))
 	s.mux.HandleFunc("POST /api/rooms/{roomID}/moves", s.withIdentity(s.handleSubmitMove))
 
 	// The room pages. They are served to anyone: the API behind them checks

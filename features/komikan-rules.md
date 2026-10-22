@@ -105,12 +105,11 @@ dogs never coordinate, and blocking the puma is exactly what needs
 coordination. Playouts can show that a rule set terminates and roughly how
 long a game runs; they cannot say whether the game is balanced. Only play
 between people can answer that, so the threshold is a design choice (the
-dogs now need the puma to get through eight of twelve), not a measured
-result.
+puma now has to catch eight of the twelve), not a measured result.
 
 ## Decisions
 
-Every rule question below was answered by the owner of the game on
-2026-10-22; the rules feature document is the record of the answers and the
-values in `rules.DefaultRuleset()` are the implementation. What remains is
+Every rule question has been answered by the owner of the game on
+2026-10-22; this document is the record of the answers and the values in
+`rules.DefaultRuleset()` are the implementation. What remains is
 play-testing, not rule-setting.

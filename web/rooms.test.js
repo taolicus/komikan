@@ -232,6 +232,48 @@ function loadPage(data) {
   return {document, calls};
 }
 
+// loadListPage runs the script of the room page as the list of rooms, the
+// page at /rooms/.
+//
+// The list is the first call of the page, and it is the call that gives the
+// browser its identity. It is held back until the test releases it, so the
+// order of the calls can be looked at.
+function loadListPage() {
+  const document = new FakeDocument();
+  const calls = [];
+  let releaseList = () => {};
+  const listReady = new Promise((resolve) => {
+    releaseList = resolve;
+  });
+  const fetch = async (path, options) => {
+    const method = options && options.method ? options.method : "GET";
+    calls.push({
+      path,
+      method,
+      headers: (options && options.headers) || {},
+      body: options && options.body ? JSON.parse(options.body) : null,
+    });
+    if (method === "POST") {
+      return {status: 201, text: async () => JSON.stringify({id: "newroom"})};
+    }
+    await listReady;
+    return {status: 200, text: async () => JSON.stringify({rooms: []})};
+  };
+  const location = {
+    pathname: "/rooms/",
+    origin: "https://example.test",
+    href: "https://example.test/rooms/",
+  };
+  const navigator = {clipboard: {writeText: async () => {}}};
+  const setInterval = () => 0;
+
+  const source = fs.readFileSync(PAGE, "utf8");
+  const script = extractScript(source);
+  eval(script);
+
+  return {document, calls, releaseList: () => releaseList()};
+}
+
 // clickNode clicks the point of the board.
 function clickNode(document, id) {
   const node = NODES.find(([nodeID]) => nodeID === id);
@@ -323,4 +365,22 @@ test("the link is gone once the second player has joined", async () => {
 
   const share = page.document.getElementById("share");
   assert.strictEqual(share.classList.contains("hidden"), true);
+});
+
+test("a room of the list waits for the identity of the browser", async () => {
+  const page = loadListPage();
+
+  // The button is pressed before the list has arrived.
+  for (const handler of page.document.getElementById("create").listeners.click) handler();
+  await tick();
+  assert.strictEqual(page.calls.filter((call) => call.method === "POST").length, 0);
+
+  page.releaseList();
+  await tick();
+  await tick();
+
+  const posts = page.calls.filter((call) => call.method === "POST");
+  assert.strictEqual(posts.length, 1);
+  assert.strictEqual(posts[0].path, "/api/rooms");
+  assert.strictEqual(posts[0].headers["X-CSRF-Token"], "test-token");
 });

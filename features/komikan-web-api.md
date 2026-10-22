@@ -99,6 +99,9 @@ room; both are plain scripts in static files, embedded in the binary.
   button waits for the list before it creates a game, and sends the token in
   the `X-CSRF-Token` header. A write that arrives with a session and without
   that header is refused with `CSRF_FAILED`.
+- The list of rooms at `/rooms/` is the same page script in its other shape:
+  it reads the list, and its "Crear sala" button waits for that read for the
+  same reason.
 - The room page reads the room (`GET /api/rooms/{roomID}`), draws the board,
   and plays the moves (`POST /api/rooms/{roomID}/moves`). While the room
   waits for the second player it shows the link of the room, with a field

@@ -259,6 +259,7 @@
   let room = null;
   let selected = null;
   let busy = false;
+  let listReady = null;
 
   const csrf = () => {
     const match = document.cookie.match(/(?:^|;\s*)komikan_csrf=([^;]*)/);
@@ -516,27 +517,35 @@
   }
 
   async function showList() {
-    const res = await api("GET", "/api/rooms");
-    const rooms = (res.data && res.data.rooms) || [];
-    const box = el("rooms");
-    box.innerHTML = "";
-    for (const item of rooms) {
-      const card = document.createElement("div");
-      card.className = "card";
-      const link = document.createElement("a");
-      link.href = "/rooms/" + item.id;
-      link.textContent = item.id.slice(0, 8);
-      const meta = document.createElement("span");
-      meta.className = "meta";
-      meta.textContent = item.status + (item.you && item.you.role ? " · " + roleName(item.you.role) : "");
-      card.appendChild(link);
-      card.appendChild(meta);
-      box.appendChild(card);
+    try {
+      const res = await api("GET", "/api/rooms");
+      const rooms = (res.data && res.data.rooms) || [];
+      const box = el("rooms");
+      box.innerHTML = "";
+      for (const item of rooms) {
+        const card = document.createElement("div");
+        card.className = "card";
+        const link = document.createElement("a");
+        link.href = "/rooms/" + item.id;
+        link.textContent = item.id.slice(0, 8);
+        const meta = document.createElement("span");
+        meta.className = "meta";
+        meta.textContent = item.status + (item.you && item.you.role ? " · " + roleName(item.you.role) : "");
+        card.appendChild(link);
+        card.appendChild(meta);
+        box.appendChild(card);
+      }
+      el("list-note").textContent = rooms.length ? "" : "Todavía no tienes salas. Crea una y comparte el enlace.";
+    } catch (err) {
+      el("list-note").textContent = "No se pudieron leer las salas.";
     }
-    el("list-note").textContent = rooms.length ? "" : "Todavía no tienes salas. Crea una y comparte el enlace.";
   }
 
   el("create").addEventListener("click", async () => {
+    // The list is the first call of the page, and it is the call that gives
+    // the browser its identity: the room is created after it, so the two
+    // calls share one session.
+    if (listReady) await listReady;
     const res = await api("POST", "/api/rooms", {});
     if (res.status === 201 && res.data) {
       location.href = "/rooms/" + res.data.id;
@@ -587,7 +596,7 @@
     } else {
       el("list-view").classList.remove("hidden");
       el("room-view").classList.add("hidden");
-      showList();
+      listReady = showList();
     }
   }
 

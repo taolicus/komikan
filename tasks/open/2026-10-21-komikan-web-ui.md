@@ -42,6 +42,12 @@ What is still to do:
 
 - the phone layout was never looked at by a person; the widths, the touch
   targets and the scroll on a narrow screen need a real look;
+- the room page polls every two seconds even when the tab is in the
+  background, and it rebuilds the whole board on every poll. A tap that
+  lands while the board is being replaced can be lost, and a hidden tab
+  keeps asking the server for something nobody is looking at. The client
+  decision in `issues/2026-10-21-komikan-client-architecture-choices.md`
+  says the polling happens while the page is visible;
 - the waiting view (only one seat taken) is still plain: the share field is
   there, but there is no indication that the second player has arrived beyond
   the status line;

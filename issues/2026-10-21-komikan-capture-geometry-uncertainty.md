@@ -53,6 +53,12 @@ needed. The remaining questions still stand.
    Pangui's turn, only captures are legal for that turn. This is a bigger
    behavioural difference than it looks, so please confirm.
 
+   **Answered on 2026-10-22: no.** The puma is not made to eat. A capture
+   on offer does not make the normal moves illegal, and the player chooses.
+   `rules.DefaultRuleset()` has `CapturePreferred: false`. The rule that a
+   chain of jumps must be continued to the end is a different rule and is
+   unchanged: once the puma has jumped, it keeps jumping while it can.
+
 4. **Does a capture require the jumped Trewa specifically?**
    Obviously it does in this game (the Trewa never captures), but the engine
    should still reject jumping over an empty node or over the Pangui itself.
@@ -91,11 +97,12 @@ How each question landed in the code:
 |---|---|---|
 | 1. straight line | (a) geometry | `internal/rules`: the node beyond the Trewa must be empty, and the Trewa must be the exact midpoint of the two nodes. One test for every direction, so no pattern table. |
 | 2. double jump | no | A jump always takes exactly one Trewa; a chain of jumps is a chain of single jumps. |
-| 3. must capture | yes | `Ruleset.CapturePreferred`. With it on, only captures are legal when a capture is on offer. |
+| 3. must capture | **no** | `Ruleset.CapturePreferred` is off: a capture on offer does not make the normal moves illegal, so the puma may decline it. |
 | 4. only a Trewa may be jumped | yes | The engine only jumps over a node holding a Trewa; an empty node or the Pangui is not a capture. |
 | 5. the Trewa are stuck | draw | `Ruleset.DrawWhenTrewaCannotMove`, and `Status` has a `DRAW` value. |
 | 6. order of the victory checks | threshold first | `Ruleset.ThresholdBeforeBlocking`. |
 
 Questions 1, 4, and 6 are already settled by the board and by the shape of
-the code. Questions 2, 3, and 5 are the ones that would change how the game
-feels, and each of them is a single field in `rules.DefaultRuleset()`.
+the code. Question 3 is answered: the puma is not forced to capture.
+Questions 2 and 5 are the ones left that would change how the game feels,
+and each of them is a single field in `rules.DefaultRuleset()`.

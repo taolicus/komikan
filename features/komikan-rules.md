@@ -31,12 +31,14 @@ next, err := engine.ApplyMove(state, moves[0])
 | `panguiMovesFirst` | true | |
 | `puTrewaWinByBlocking` | true | the puma with no legal move loses |
 | `puTrewaWinByOccupyingTriangle` | false | the canonical board has no triangle area |
-| `capturePreferred` | true | the puma must capture when it can |
+| `capturePreferred` | false | the puma is never made to eat: it may move normally instead |
 | `drawWhenTrewaCannotMove` | true | the dogs with no legal move end the game in a draw |
 | `thresholdBeforeBlocking` | true | the capture that wins the game is not cancelled by the position it leaves |
 
-These are the defaults proposed in the open rule issues, not yet endorsed by
-the user. They all live in one struct, so a change is a change of values.
+These are the defaults of the variant the site plays. `capturePreferred` is
+the one the user has answered; the rest are still proposals from the open
+rule issues. They all live in one struct, so a change is a change of
+values.
 
 ## Capture geometry
 
@@ -59,6 +61,9 @@ jumps.
 ## Turn flow
 
 - The puma moves first.
+- The puma is not made to hunt. A capture on offer does not make the normal
+  moves illegal: the player chooses between them (`capturePreferred` is
+  off).
 - After a jump, the puma keeps playing while another jump is available
   (`captureSequenceActive`). The turn only ends when no jump is left.
 - A chain of jumps counts as one turn.
@@ -77,14 +82,20 @@ outside the engine.
 
 ## What the random playouts show
 
-300 games with random legal moves: every game ended, all of them with the
-puma reaching six captures, and the average game ran about 73 moves. The
-dogs never blocked the puma, because blocking needs the dogs to coordinate
-and random play does not. A rules balance question, not an engine bug: the
-dogs have to be played, not wandered.
+200 games with random legal moves, with the puma free to decline a capture:
+every game ended, the average game ran about 153 moves, and the longest ran
+552. 199 of them ended with the puma reaching six captures, and one with the
+dogs blocking the puma.
+
+Before the puma was freed from the forced capture the same playouts ran
+about 73 moves and the dogs never blocked the puma at all, because the puma
+was always hunting. The difference is a balance question, not an engine bug:
+the dogs have to be played, not wandered.
 
 ## Still open
 
-The rule values above are proposals. The user's answers are still to come
-(see `issues/2026-10-21-komikan-rules-and-role-assignment-questions.md` and
+`capturePreferred` was answered on 2026-10-22: the puma is not forced to
+capture. The other rule values are still proposals, and the user's answers
+are still to come (see
+`issues/2026-10-21-komikan-rules-and-role-assignment-questions.md` and
 `issues/2026-10-21-komikan-capture-geometry-uncertainty.md`).

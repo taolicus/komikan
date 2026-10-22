@@ -38,7 +38,8 @@ type Ruleset struct {
 	// designated triangle area. The canonical board has none, so the
 	// engine does not implement it.
 	PuTrewaWinByOccupyingTriangle bool `json:"puTrewaWinByOccupyingTriangle"`
-	// CapturePreferred makes the Pangui capture whenever it can.
+	// CapturePreferred makes the Pangui capture whenever it can. With it
+	// off, the Pangui may decline a capture and move normally instead.
 	CapturePreferred bool `json:"capturePreferred"`
 	// DrawWhenTrewaCannotMove ends the game in a draw when the Trewa have
 	// no legal move.
@@ -51,9 +52,9 @@ type Ruleset struct {
 
 // DefaultRuleset returns the ruleset of the documented default variant.
 //
-// These are the defaults proposed in the open rule issues; they are values
-// in one place, so a different answer changes this function and nothing
-// else.
+// The values are answers to the open rule issues where an answer has been
+// given, and proposals where it has not. They live in one place, so a
+// different answer changes this function and nothing else.
 func DefaultRuleset() Ruleset {
 	return Ruleset{
 		PanguiCapturesToWin:           6,
@@ -63,7 +64,7 @@ func DefaultRuleset() Ruleset {
 		PanguiMovesFirst:              true,
 		PuTrewaWinByBlocking:          true,
 		PuTrewaWinByOccupyingTriangle: false,
-		CapturePreferred:              true,
+		CapturePreferred:              false,
 		DrawWhenTrewaCannotMove:       true,
 		ThresholdBeforeBlocking:       true,
 	}

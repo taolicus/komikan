@@ -22,7 +22,7 @@ that assignment, so the API and UI cannot be specified without it.
 | `panguiMovesFirst` | true | true | |
 | `puTrewaWinByBlocking` | true | true | Pangui with no legal move loses. |
 | `puTrewaWinByOccupyingTriangle` | false | false | Disabled until a layout with a defined "triangle area" exists. |
-| Capture preferred over normal move | not stated | true | See the capture geometry issue. |
+| Capture preferred over normal move | not stated | **false** | See the capture geometry issue. |
 | No-legal-move-for-Trewa | not stated | draw | See the capture geometry issue. |
 
 ## Part 2: role assignment (missing from the specs)
@@ -80,3 +80,10 @@ while the answers are still open. Every value in Part 1 is a field of
 `rules.Ruleset`, and `rules.DefaultRuleset()` holds the proposals: changing
 an answer means changing one struct, not the engine. The rules are written
 up in `features/komikan-rules.md`.
+
+**Update 2026-10-22:** one Part 1 value is answered. The puma is not forced
+to capture: `CapturePreferred` is off, so a capture on offer leaves the
+normal moves legal. The rest of Part 1 is still open. The change also
+lengthened the games: with random play the average went from about 73
+moves to about 153, and the dogs blocked the puma in one game out of 200
+where they never managed it before.

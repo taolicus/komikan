@@ -28,7 +28,7 @@ small board, and a decision that cannot be taken back.
 | **Pieces** | 1 Pangui (puma), 12 Pu Trewa (dogs) |
 | **Turns** | The Pangui moves first, then the players alternate |
 | **Movement** | One segment along the lines of the board, in any direction, to an empty point |
-| **Capture** | Only the Pangui captures, by jumping over a Trewa. Consecutive captures are allowed and count as one turn. |
+| **Capture** | Only the Pangui captures, by jumping over a Trewa. A capture is never forced: the puma may step on instead. Consecutive captures are allowed and count as one turn. |
 | **Victory** | The Pangui wins by capturing six Trewa. The Trewa win by leaving the Pangui with no legal move. |
 
 The game exists in several regional and historical variants — the shape of the

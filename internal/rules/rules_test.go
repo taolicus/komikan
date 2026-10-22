@@ -286,14 +286,31 @@ func TestMandatoryCaptureDoesNotSwitchPlayers(t *testing.T) {
 	}
 }
 
-func TestCaptureIsPreferredOverANormalMove(t *testing.T) {
+func TestPanguiMayDeclineACapture(t *testing.T) {
 	engine := testEngine(t)
 	state := stateWith(map[board.NodeID]board.Piece{
 		7: board.PiecePangui,
 		6: board.PieceTrewa,
 	}, PlayerPangui)
 
+	// The default ruleset does not make the Pangui hunt: the capture and
+	// the normal move are both legal, and the player chooses.
 	moves := engine.LegalMoves(state, PlayerPangui)
+	if !hasMove(moves, 7, 5, MoveCapture) {
+		t.Errorf("the capture from 7 to 5 is missing: %v", moves)
+	}
+	if !hasMove(moves, 7, 2, MoveNormal) {
+		t.Errorf("the Pangui may decline the capture: %v", moves)
+	}
+
+	// A variant that prefers the capture offers the capture alone.
+	ruleset := DefaultRuleset()
+	ruleset.CapturePreferred = true
+	other, err := NewEngine(engine.board, ruleset)
+	if err != nil {
+		t.Fatalf("NewEngine(): %v", err)
+	}
+	moves = other.LegalMoves(state, PlayerPangui)
 	for _, move := range moves {
 		if move.Type == MoveNormal {
 			t.Errorf("the Pangui must capture when it can: %v", moves)
@@ -301,18 +318,6 @@ func TestCaptureIsPreferredOverANormalMove(t *testing.T) {
 	}
 	if !hasMove(moves, 7, 5, MoveCapture) {
 		t.Errorf("the capture from 7 to 5 is missing: %v", moves)
-	}
-
-	// With the preference off, the normal move is legal again.
-	ruleset := DefaultRuleset()
-	ruleset.CapturePreferred = false
-	other, err := NewEngine(engine.board, ruleset)
-	if err != nil {
-		t.Fatalf("NewEngine(): %v", err)
-	}
-	moves = other.LegalMoves(state, PlayerPangui)
-	if !hasMove(moves, 7, 2, MoveNormal) {
-		t.Errorf("without the preference the Pangui may move normally: %v", moves)
 	}
 }
 
@@ -520,7 +525,10 @@ func TestRandomPlayoutsReachATerminalState(t *testing.T) {
 			}
 			state = next
 			steps++
-			if steps > 500 {
+			// The cap is a safety net against a game that never ends, not
+			// a bound on a real game: the puma is not made to capture, so
+			// it can wander, and 200 random games ran to 552 moves.
+			if steps > 2000 {
 				t.Fatalf("game %d: the game did not end", game)
 			}
 		}

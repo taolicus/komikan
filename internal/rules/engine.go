@@ -99,7 +99,9 @@ func (e *Engine) panguiMoves(state GameState) []Move {
 		return sortMoves(moves)
 	}
 
-	// Traditional accounts say the puma must capture when it can.
+	// The Pangui is not made to hunt: with the default ruleset it may
+	// decline a capture and move normally instead. A variant that forces
+	// the capture sets CapturePreferred.
 	if e.ruleset.CapturePreferred && len(captures) > 0 {
 		return captures
 	}

@@ -420,7 +420,11 @@
       return;
     }
 
-    const move = (room.legalMoves || []).find((m) => m.to === id);
+    // A destination belongs to the piece that was picked. With the twelve
+    // dogs the same point is often reachable by more than one of them, and
+    // the move that is played must be the one of the picked dog.
+    if (selected === null) return;
+    const move = movesFrom(selected).find((m) => m.to === id);
     if (!move) return;
     selected = null;
     submit(move);

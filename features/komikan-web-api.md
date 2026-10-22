@@ -87,6 +87,25 @@ The summary carries the board topology (38 nodes with their coordinates and
 plays on. It also carries the legal moves, but only for the seat holder
 whose turn it is.
 
+## What a click means
+
+The room page draws the legal moves of the player whose turn it is. A click on
+a piece picks it and shows the points it can reach; a click on one of those
+points plays that move.
+
+The picked piece decides which move a point means. With the twelve dogs the
+same point is often reachable by more than one of them, and the move that is
+played has to be the one of the picked dog. A click on a point the picked
+piece cannot reach plays nothing.
+
+The page script has a test of its own: `web/rooms.test.js` runs the script of
+`web/rooms.html` against a fake DOM and a stubbed fetch, and looks at the
+move request that reaches the server.
+
+```sh
+node --test "web/**/*.test.js"   # run the client test
+```
+
 ## The game state document
 
 The state is a JSON blob in the `games` row, next to a `version` column that

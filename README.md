@@ -71,13 +71,14 @@ Under construction. What exists today:
 
 - the board as data in Go (`internal/board`), with a validator and tests that
   re-prove the topology from scratch;
-- an ASCII and an SVG renderer, used both by the coming-soon page and by the
+- an ASCII and an SVG renderer, used both by the home page and by the
   board dump command;
-- the coming-soon site itself, served by a single static Go binary;
+- the home page, served by a single static Go binary: a button that starts a
+  game, a link to the rooms, and a short description of the game;
 - rooms and player identities: a browser gets an identity on its first
   visit, creates a room, shares the link, and the second player joins it.
   The roles are dealt at random when the second player arrives. The rooms
-  live at `/rooms/`, and the coming-soon page stays at `/`;
+  live at `/rooms/`, and the home page stays at `/`;
 - the rules of the game (`internal/rules`): legal moves, captures, turns,
   and victory, all driven by a configurable ruleset;
 - moves over HTTP, decided by the server, and a board in the browser drawn
@@ -85,6 +86,8 @@ Under construction. What exists today:
 - a test suite that plays whole games through the API, restarts the service
   against the same database file, and proves that two moves submitted at the
   same moment leave exactly one of them standing;
+- a test of the room page, which proves that the dog the player picked is the
+  dog that moves;
 - the service on the VPS, with a runbook for backups, restarts and health.
 
 Next: the remaining interface work, and the answer to the open rule questions.
@@ -97,6 +100,7 @@ Requires Go 1.27 or newer.
 
 ```sh
 go test ./...                     # run the tests
+node --test "web/**/*.test.js"        # run the test of the room page
 go run ./cmd/server               # serve the site on 127.0.0.1:18082
 go run ./cmd/boarddump            # print the board as ASCII
 go run ./cmd/boarddump -svg docs/board.svg   # regenerate the board image
@@ -118,7 +122,7 @@ sh deploy.sh
 | `internal/board` | Board topology, positions, validation, rendering |
 | `internal/httpapi` | Routing, identities, rooms, JSON shapes |
 | `internal/store` | Persistence: players, rooms, seats, games, moves |
-| `web/` | The static pages, embedded in the binary |
+| `web/` | The static pages, embedded in the binary, and the test of the room page |
 | `docs/` | Design documents: rules, application spec, original board sketch |
 | `features/` | Durable knowledge about the system as built |
 | `issues/`, `tasks/` | Open questions and planned work |

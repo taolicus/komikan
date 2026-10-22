@@ -86,20 +86,6 @@
     opacity: 0.5;
     cursor: default;
   }
-  .rooms-link {
-    margin: 0.9rem 0 0;
-    font-size: 0.85rem;
-  }
-  .rooms-link a {
-    color: var(--muted);
-    text-decoration: none;
-    border-bottom: 1px solid #2a2620;
-    padding-bottom: 1px;
-  }
-  .rooms-link a:hover {
-    color: var(--ink);
-    border-bottom-color: #6b6252;
-  }
   .note {
     margin: 0.6rem 0 0;
     color: var(--muted);
@@ -107,6 +93,51 @@
   }
   .note:empty {
     display: none;
+  }
+  .games {
+    width: min(78vw, 340px);
+    margin-top: 1.5rem;
+  }
+  .games h2 {
+    margin: 0 0 0.6rem;
+    color: var(--muted);
+    font-family: "Cinzel", Georgia, "Times New Roman", serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-indent: 0.25em;
+    text-transform: uppercase;
+  }
+  .games ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .games li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.8rem;
+    border: 1px solid #2a2620;
+    border-radius: 8px;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  .games a {
+    color: var(--ink);
+    text-decoration: none;
+    font-family: "Cinzel", Georgia, "Times New Roman", serif;
+    letter-spacing: 0.04em;
+  }
+  .games a:hover {
+    color: #d8c9a6;
+  }
+  .games .meta {
+    color: var(--muted);
+    white-space: nowrap;
   }
   .blurb {
     margin: 1.7rem 0 0;
@@ -124,7 +155,10 @@
   <div class="actions">
     <button id="create" class="primary" type="button">Nueva partida</button>
   </div>
-  <p class="rooms-link"><a href="/rooms/">Ver las partidas</a></p>
+  <div class="games" id="games" hidden>
+    <h2>Tus partidas</h2>
+    <ul id="games-list"></ul>
+  </div>
   <p class="note" id="note"></p>
   <div class="board">
 <!--BOARD-->
@@ -141,6 +175,50 @@
 
   var button = document.getElementById("create");
   var note = document.getElementById("note");
+  var games = document.getElementById("games");
+  var gamesList = document.getElementById("games-list");
+
+  var roleName = function (role) {
+    if (role === "PANGUI") return "Pangui 🐆";
+    if (role === "TREWA") return "Trewa 🐕";
+    return "";
+  };
+
+  var roomState = function (room) {
+    if (room.status === "FINISHED") return "terminada";
+    if (room.status === "WAITING") return "esperando al rival";
+    return "en curso";
+  };
+
+  // The games of this browser, right away.
+  var loadGames = function () {
+    return fetch("/api/rooms", {credentials: "same-origin"})
+      .then(function (res) {
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then(function (data) {
+        var rooms = (data && data.rooms) || [];
+        for (var i = 0; i < rooms.length; i++) {
+          var room = rooms[i];
+          var item = document.createElement("li");
+          var link = document.createElement("a");
+          link.href = "/rooms/" + room.id;
+          link.textContent = room.id.slice(0, 8);
+          var meta = document.createElement("span");
+          meta.className = "meta";
+          var role = (room.you && room.you.role) ? roleName(room.you.role) : "";
+          meta.textContent = roomState(room) + (role ? " · " + role : "");
+          item.appendChild(link);
+          item.appendChild(meta);
+          gamesList.appendChild(item);
+        }
+        games.hidden = rooms.length === 0;
+      })
+      .catch(function () {
+        // The list is a convenience: the button works without it.
+      });
+  };
 
   // The browser gets its identity on this call, so the new room belongs to
   // whoever pressed the button.
@@ -165,6 +243,8 @@
       note.textContent = "No se pudo crear la partida. Inténtalo de nuevo.";
     });
   });
+
+  loadGames();
 })();
 </script>
 </body>

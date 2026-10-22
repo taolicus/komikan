@@ -74,7 +74,8 @@ Under construction. What exists today:
 - an ASCII and an SVG renderer, used both by the home page and by the
   board dump command;
 - the home page, served by a single static Go binary: a button that starts a
-  game, a link to the rooms, and a short description of the game;
+  game, the list of the games of the browser, and a short description of the
+  game;
 - rooms and player identities: a browser gets an identity on its first
   visit, creates a room, shares the link, and the second player joins it.
   The roles are dealt at random when the second player arrives. The rooms
@@ -100,7 +101,7 @@ Requires Go 1.27 or newer.
 
 ```sh
 go test ./...                     # run the tests
-node --test "web/**/*.test.js"        # run the test of the room page
+node --test "web/**/*.test.js"    # run the tests of the pages
 go run ./cmd/server               # serve the site on 127.0.0.1:18082
 go run ./cmd/boarddump            # print the board as ASCII
 go run ./cmd/boarddump -svg docs/board.svg   # regenerate the board image
@@ -122,7 +123,7 @@ sh deploy.sh
 | `internal/board` | Board topology, positions, validation, rendering |
 | `internal/httpapi` | Routing, identities, rooms, JSON shapes |
 | `internal/store` | Persistence: players, rooms, seats, games, moves |
-| `web/` | The static pages, embedded in the binary, and the test of the room page |
+| `web/` | The static pages, embedded in the binary, and their tests |
 | `docs/` | Design documents: rules, application spec, original board sketch |
 | `features/` | Durable knowledge about the system as built |
 | `issues/`, `tasks/` | Open questions and planned work |

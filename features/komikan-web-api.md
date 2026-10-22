@@ -87,6 +87,21 @@ The summary carries the board topology (38 nodes with their coordinates and
 plays on. It also carries the legal moves, but only for the seat holder
 whose turn it is.
 
+## The two pages
+
+`web/index.html` is the home page and `web/rooms.html` is the page of a
+room; both are plain scripts in static files, embedded in the binary.
+
+- The home page starts a game with a button (`POST /api/rooms`) and lists the
+  games of the identity (`GET /api/rooms`), with the state of each one and
+  the role of the player.
+- The room page reads the room (`GET /api/rooms/{roomID}`), draws the board,
+  and plays the moves (`POST /api/rooms/{roomID}/moves`). While the room
+  waits for the second player it shows the link of the room, with a field
+  holding the whole URL, a share button (only where the browser has the
+  share API) and a copy button. Once the second player has joined, the link
+  is gone: the game is on.
+
 ## What a click means
 
 The room page draws the legal moves of the player whose turn it is. A click on
@@ -98,12 +113,14 @@ same point is often reachable by more than one of them, and the move that is
 played has to be the one of the picked dog. A click on a point the picked
 piece cannot reach plays nothing.
 
-The page script has a test of its own: `web/rooms.test.js` runs the script of
-`web/rooms.html` against a fake DOM and a stubbed fetch, and looks at the
-move request that reaches the server.
+## The tests of the pages
+
+The page scripts are tested on their own: `web/rooms.test.js` and
+`web/index.test.js` run them against the fake DOM of `web/fakedom.js` and a
+stubbed fetch, and look at what the page drew and at the requests it made.
 
 ```sh
-node --test "web/**/*.test.js"   # run the client test
+node --test "web/**/*.test.js"   # run the client tests
 ```
 
 ## The game state document

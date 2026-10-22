@@ -121,8 +121,8 @@
     stroke: #6f6656;
     stroke-width: 2;
   }
-  .board .pangui { fill: #14532d; }
-  .board .trewa { fill: #7f1d1d; }
+  .board .pangui { fill: var(--green); }
+  .board .trewa { fill: var(--red); }
   .board .last {
     fill: none;
     stroke: #c9a227;
@@ -176,53 +176,47 @@
     color: var(--ink);
     font-weight: 600;
   }
-  .legend {
+  .share {
     display: flex;
-    gap: 1.1rem;
-    justify-content: center;
-    font-size: 0.82rem;
-    color: var(--muted);
-    margin-bottom: 0.9rem;
-  }
-  .legend span::before {
-    content: "";
-    display: inline-block;
-    width: 0.7em;
-    height: 0.7em;
-    border-radius: 50%;
-    margin-right: 0.4em;
-    vertical-align: baseline;
-  }
-  .legend .pangui::before { background: var(--green); }
-  .legend .trewa::before { background: var(--red); }
-  .legend .yours::before { background: #3b82f6; }
-  table.seats {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
     width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
   }
-  table.seats th, table.seats td {
-    text-align: left;
-    padding: 0.4rem 0.2rem;
-    border-bottom: 1px solid var(--line);
-  }
-  table.seats th {
+  .share input {
+    flex: 1 1 14rem;
+    min-width: 0;
+    font: inherit;
+    font-size: 0.8rem;
     color: var(--muted);
-    font-weight: 500;
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    background: #14120f;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.5rem 0.7rem;
+  }
+  a.link-button {
+    display: inline-block;
+    font: inherit;
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: #1d1a15;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.55rem 1.1rem;
+    text-decoration: none;
+  }
+  a.link-button:hover {
+    border-color: #6b6252;
   }
   .hidden { display: none !important; }
 </style>
 </head>
 <body>
 <main>
-  <h1>Komikan</h1>
-  <p class="sub" id="heading">Salas</p>
-
   <section id="list-view" class="hidden">
+    <h1>Komikan</h1>
+    <p class="sub">Salas</p>
     <div class="actions">
       <button id="create">Crear sala</button>
     </div>
@@ -231,26 +225,19 @@
   </section>
 
   <section id="room-view" class="hidden">
-    <p class="status" id="room-status"></p>
-    <div class="score" id="score"></div>
-    <div class="legend">
-      <span class="pangui">Pangui</span>
-      <span class="trewa">Trewa</span>
-      <span class="yours">Tu jugada</span>
+    <div class="share hidden" id="share">
+      <input id="share-url" type="text" readonly aria-label="Enlace de la sala">
+      <button id="share-native">Compartir</button>
+      <button id="copy">Copiar</button>
+    </div>
+    <div class="actions hidden" id="join-row">
+      <button id="join">Unirse</button>
     </div>
     <div class="board" id="room-board"></div>
-    <table class="seats">
-      <thead>
-        <tr><th>Puesto</th><th>Jugador</th><th>Rol</th></tr>
-      </thead>
-      <tbody id="room-seats"></tbody>
-    </table>
-    <div class="actions">
-      <button id="join">Unirse</button>
-      <button id="copy">Copiar enlace</button>
-      <button id="back">Volver</button>
-    </div>
+    <p class="status" id="room-status"></p>
+    <div class="score" id="score"></div>
     <p class="note" id="room-note"></p>
+    <p class="actions"><a class="link-button" href="/">Volver al inicio</a></p>
   </section>
 </main>
 <script>
@@ -264,6 +251,9 @@
   const el = (id) => document.getElementById(id);
   const roomMatch = location.pathname.match(/^\/rooms\/([A-Za-z0-9_-]+)\/?$/);
   const roomID = roomMatch ? roomMatch[1] : null;
+
+  // The link of the room, the one that is shared with the second player.
+  const roomURL = () => location.origin + "/rooms/" + roomID;
 
   let board = null;
   let room = null;
@@ -472,14 +462,19 @@
     const note = el("room-note");
     note.textContent = "";
 
+    // The link is only worth sharing while the room waits for the second
+    // player. After that it is a game in progress.
+    const waiting = data.status === "WAITING";
+    el("share").classList.toggle("hidden", !waiting);
+    if (waiting) el("share-url").value = roomURL();
+
     if (!data.you) {
       status.textContent = "No estás en esta sala.";
-      el("join").hidden = false;
-      el("join").disabled = false;
+      el("join-row").classList.remove("hidden");
       draw();
       return;
     }
-    el("join").hidden = true;
+    el("join-row").classList.add("hidden");
 
     if (game.status === "PANGUI_WON") {
       status.textContent = "Gana el Pangui 🐆";
@@ -501,19 +496,6 @@
       "<span>Pangui <b>" + captured + "</b> / " + threshold + "</span>" +
       "<span>Trewa <b>" + (12 - captured) + "</b> / 12</span>";
 
-    const body = el("room-seats");
-    body.innerHTML = "";
-    for (const seat of data.seats) {
-      const row = document.createElement("tr");
-      const mine = data.you && seat.playerId === data.you.playerId;
-      for (const value of [seat.seat, (mine ? "tú" : seat.playerId.slice(0, 8)), roleName(seat.role)]) {
-        const cell = document.createElement("td");
-        cell.textContent = value;
-        row.appendChild(cell);
-      }
-      body.appendChild(row);
-    }
-
     draw();
   }
 
@@ -534,10 +516,6 @@
   }
 
   async function showList() {
-    el("heading").textContent = "Salas";
-    el("list-view").classList.remove("hidden");
-    el("room-view").classList.add("hidden");
-
     const res = await api("GET", "/api/rooms");
     const rooms = (res.data && res.data.rooms) || [];
     const box = el("rooms");
@@ -577,26 +555,45 @@
 
   el("copy").addEventListener("click", async () => {
     try {
-      await navigator.clipboard.writeText(location.href);
+      await navigator.clipboard.writeText(roomURL());
       el("room-note").textContent = "Enlace copiado.";
     } catch (err) {
-      el("room-note").textContent = location.href;
+      // The clipboard is not reachable: the link is in the field, ready to
+      // be picked by hand.
+      el("share-url").focus();
+      el("share-url").select();
+      el("room-note").textContent = "Copia el enlace del campo de arriba.";
     }
   });
 
-  el("back").addEventListener("click", () => {
-    location.href = "/rooms/";
+  el("share-native").addEventListener("click", async () => {
+    if (!navigator.share) return;
+    try {
+      await navigator.share({
+        title: "Komikan",
+        text: "Juega conmigo a Komikan.",
+        url: roomURL(),
+      });
+    } catch (err) {
+      // The share sheet was dismissed.
+    }
   });
 
   function start() {
     if (roomID) {
-      el("heading").textContent = "Partida";
       el("room-view").classList.remove("hidden");
       el("list-view").classList.add("hidden");
       refresh();
     } else {
+      el("list-view").classList.remove("hidden");
+      el("room-view").classList.add("hidden");
       showList();
     }
+  }
+
+  // Not every browser can share a link; the copy button is always there.
+  if (!navigator.share) {
+    el("share-native").classList.add("hidden");
   }
 
   start();

@@ -15,9 +15,9 @@ What is already there, in `web/rooms.html`:
 
 - the room list at `/rooms/`, with a create action and the role of each
   room;
-- the room page at `/rooms/{roomID}`, with the seats, the roles, whose turn
-  it is, the captured count against the threshold, the winner at the end,
-  and a copy-link button;
+- the room page at `/rooms/{roomID}`: the board, whose turn it is, the
+  captured count against the threshold, the winner at the end, and the link to
+  share with the second player;
 - the board drawn in the browser as SVG from the topology the server sends,
   with the puma and the dogs drawn distinctly, the last move marked, and the
   legal destinations highlighted when a piece is picked;
@@ -27,23 +27,28 @@ What is already there, in `web/rooms.html`:
 And in `web/index.html`, the home page:
 
 - a primary button that creates a game and takes the player straight to it;
-- a smaller link to the list of rooms under the button.
+- the list of the games of the browser, right away, with the state of each
+  one and the role of the player;
+- a short description of the game under the board.
+
+The game screen was reshaped on the user's word on 2026-10-22: the title and
+the subtitle are gone, the turn and the score sit under the board, the colour
+legend and the table of seats are gone, the link to share is a field with the
+whole URL plus a share button and a copy button above the board, visible only
+while the room waits for the second player, and "Volver" is a link to the
+home page.
 
 What is still to do:
 
 - the phone layout was never looked at by a person; the widths, the touch
   targets and the scroll on a narrow screen need a real look;
-- the waiting view (only one seat taken) is plain: no invitation screen, no
-  copy-link prominence, no indication that the second player has arrived
-  beyond the status line;
+- the waiting view (only one seat taken) is still plain: the share field is
+  there, but there is no indication that the second player has arrived beyond
+  the status line;
 - the game page has no move history, no captured pieces shown on the board,
   and no way to see the opponent's last move other than the marked node;
-- the home page at `/` has a primary button that creates a game and a smaller
-  link to the list of rooms, but it does not list the player's own rooms. The
-  "Próximamente" line under the title was dropped on the user's word on
-  2026-10-21, when the game became playable. The button ("Nueva partida") and
-  the link sit above the board, and a short description of the game sits
-  below it.
+- the home page lists the games of the browser, but it does not say who the
+  opponent is, and it does not refresh while it stays open.
 
 ## Outcome
 

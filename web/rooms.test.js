@@ -12,6 +12,8 @@ const assert = require("node:assert");
 const fs = require("node:fs");
 const path = require("node:path");
 
+const {FakeDocument, extractScript, tick} = require("./fakedom.js");
+
 const PAGE = path.join(__dirname, "rooms.html");
 const CELL = 64;
 const MARGIN = 48;
@@ -170,97 +172,6 @@ const PANGUI_MOVES = [
   {from: 7, to: 11, type: "NORMAL"},
 ];
 
-// ---- a DOM small enough to run the page in ---------------------------
-
-class FakeElement {
-  constructor(tag, registry) {
-    this.tagName = tag;
-    this.registry = registry;
-    this.attributes = {};
-    this.children = [];
-    this.listeners = {};
-    this.textContent = "";
-    this.className = "";
-    this.href = "";
-    this.hidden = false;
-    this.disabled = false;
-    const classes = new Set();
-    this.classList = {
-      add: (name) => classes.add(name),
-      remove: (name) => classes.delete(name),
-      contains: (name) => classes.has(name),
-    };
-    this._innerHTML = "";
-  }
-
-  setAttribute(name, value) {
-    this.attributes[name] = String(value);
-  }
-
-  getAttribute(name) {
-    return this.attributes[name];
-  }
-
-  appendChild(child) {
-    this.children.push(child);
-    return child;
-  }
-
-  addEventListener(name, handler) {
-    if (!this.listeners[name]) this.listeners[name] = [];
-    this.listeners[name].push(handler);
-  }
-
-  // Setting the inner HTML replaces the children: the page empties the
-  // board before it draws it again.
-  set innerHTML(value) {
-    this._innerHTML = value;
-    if (value === "") {
-      for (const child of this.children) removeFromRegistry(this.registry, child);
-      this.children = [];
-    }
-  }
-
-  get innerHTML() {
-    return this._innerHTML;
-  }
-}
-
-// removeFromRegistry takes an element and everything inside it out of the
-// registry of the document.
-function removeFromRegistry(registry, element) {
-  for (const child of element.children) removeFromRegistry(registry, child);
-  const index = registry.indexOf(element);
-  if (index >= 0) registry.splice(index, 1);
-}
-
-class FakeDocument {
-  constructor() {
-    this.registry = [];
-    this.byId = new Map();
-    this.cookie = "komikan_csrf=test-token";
-  }
-
-  getElementById(id) {
-    if (!this.byId.has(id)) {
-      const element = new FakeElement("div", this.registry);
-      this.registry.push(element);
-      this.byId.set(id, element);
-    }
-    return this.byId.get(id);
-  }
-
-  createElement(tag) {
-    const element = new FakeElement(tag, this.registry);
-    this.registry.push(element);
-    return element;
-  }
-
-  createElementNS(namespace, tag) {
-    return this.createElement(tag);
-  }
-}
-
 // ---- the page under test ---------------------------------------------
 
 // summary builds the room the server would send to a player.
@@ -307,6 +218,7 @@ function loadPage(data) {
   };
   const location = {
     pathname: "/rooms/testroom",
+    origin: "https://example.test",
     href: "https://example.test/rooms/testroom",
   };
   const navigator = {clipboard: {writeText: async () => {}}};
@@ -314,7 +226,7 @@ function loadPage(data) {
   const setInterval = () => 0;
 
   const source = fs.readFileSync(PAGE, "utf8");
-  const script = source.match(/<script>([\s\S]*?)<\/script>/)[1];
+  const script = extractScript(source);
   eval(script);
 
   return {document, calls};
@@ -339,8 +251,6 @@ function clickNode(document, id) {
 function moveRequests(calls) {
   return calls.filter((call) => call.path.endsWith("/moves"));
 }
-
-const tick = () => new Promise((resolve) => setImmediate(resolve));
 
 // ---- the tests --------------------------------------------------------
 
@@ -391,4 +301,26 @@ test("the puma plays the move that was picked", async () => {
   assert.strictEqual(moves.length, 1);
   assert.strictEqual(moves[0].body.from, 7);
   assert.strictEqual(moves[0].body.to, 11);
+});
+
+test("the link is shared while the room waits for the second player", async () => {
+  const data = summary("TREWA", TREWA_MOVES);
+  data.status = "WAITING";
+  const page = loadPage(data);
+  await tick();
+
+  const share = page.document.getElementById("share");
+  assert.strictEqual(share.classList.contains("hidden"), false);
+  assert.strictEqual(
+    page.document.getElementById("share-url").value,
+    "https://example.test/rooms/testroom"
+  );
+});
+
+test("the link is gone once the second player has joined", async () => {
+  const page = loadPage(summary("TREWA", TREWA_MOVES));
+  await tick();
+
+  const share = page.document.getElementById("share");
+  assert.strictEqual(share.classList.contains("hidden"), true);
 });

@@ -67,7 +67,11 @@ The authoritative node and edge list lives in
 
 ## Status
 
-Under construction. What exists today:
+Live and playable at <https://komikan.tequionet.org>. The site is in
+Spanish. To play: open the page, press **Nueva partida**, and send the
+link that appears to the other player; they open it and press **Unirse**.
+
+What exists today:
 
 - the board as data in Go (`internal/board`), with a validator and tests that
   re-prove the topology from scratch;
@@ -91,9 +95,13 @@ Under construction. What exists today:
   dog that moves;
 - the service on the VPS, with a runbook for backups, restarts and health.
 
-Next: the remaining interface work, and the answer to the open rule questions.
+Next: the remaining interface work, the hardening of the public endpoint,
+and the answer to the open rule questions.
 
-Some rules are still open questions and are tracked in `issues/`.
+Some rules are still open questions and are tracked in `issues/`. They are
+proposals, not settled history: the game plays with them today, and the
+values live in one struct (`rules.DefaultRuleset()`), so an answer is a
+change of values rather than a change of the engine.
 
 ## Development
 

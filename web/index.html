@@ -139,6 +139,22 @@
     color: var(--muted);
     white-space: nowrap;
   }
+  .about-toggle-wrap {
+    margin-top: 1.2rem;
+  }
+  .about-toggle-wrap a {
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px solid #2a2620;
+    font-size: 0.9rem;
+  }
+  .about-toggle-wrap a:hover {
+    color: var(--ink);
+    border-bottom-color: #6b6252;
+  }
+  .about.hidden {
+    display: none;
+  }
   .blurb {
     margin: 1.7rem 0 0;
     max-width: 32rem;
@@ -160,14 +176,17 @@
     <ul id="games-list"></ul>
   </div>
   <p class="note" id="note"></p>
-  <div class="board">
+  <p class="about-toggle-wrap"><a id="about-toggle" href="#">Acerca de Komikan</a></p>
+  <div class="about" id="about">
+    <div class="board">
 <!--BOARD-->
+    </div>
+    <p class="blurb">Komikan es un juego de mesa mapuche para dos: uno lleva al
+    Pangui, el puma, y el otro a los doce Trewa, los perros. Sobre un tablero de
+    38 puntos, el puma avanza un paso por turno y salta sobre los perros para
+    capturarlos. Gana al hacer seis capturas o al dejar a los perros sin jugada;
+    los perros ganan al acorralar al puma.</p>
   </div>
-  <p class="blurb">Komikan es un juego de mesa mapuche para dos: uno lleva al
-  Pangui, el puma, y el otro a los doce Trewa, los perros. Sobre un tablero de
-  38 puntos, el puma avanza un paso por turno y salta sobre los perros para
-  capturarlos. Gana al hacer seis capturas o al dejar a los perros sin jugada;
-  los perros ganan al acorralar al puma.</p>
 </main>
 <script>
 (function () {
@@ -177,6 +196,32 @@
   var note = document.getElementById("note");
   var games = document.getElementById("games");
   var gamesList = document.getElementById("games-list");
+  var aboutToggle = document.getElementById("about-toggle");
+  var about = document.getElementById("about");
+
+  // If the player has games, hide the introduction (board + description) by
+  // default and tuck it behind a toggle.
+  var hasGames = false;
+  var aboutHidden = false;
+
+  var applyAboutState = function () {
+    if (hasGames && aboutHidden) {
+      about.classList.add("hidden");
+      aboutToggle.textContent = "Acerca de Komikan";
+    } else if (hasGames && !aboutHidden) {
+      about.classList.remove("hidden");
+      aboutToggle.textContent = "Ocultar Acerca de Komikan";
+    } else {
+      about.classList.remove("hidden");
+      aboutToggle.textContent = "Acerca de Komikan";
+    }
+  };
+
+  aboutToggle.addEventListener("click", function (event) {
+    event.preventDefault();
+    aboutHidden = !aboutHidden;
+    applyAboutState();
+  });
 
   var roleName = function (role) {
     if (role === "PANGUI") return "Pangui 🐆";
@@ -214,6 +259,11 @@
           gamesList.appendChild(item);
         }
         games.hidden = rooms.length === 0;
+        if (rooms.length > 0) {
+          hasGames = true;
+          aboutHidden = true;
+          applyAboutState();
+        }
       })
       .catch(function () {
         // The list is a convenience: the button works without it.
@@ -255,6 +305,8 @@
       note.textContent = "No se pudo crear la partida. Inténtalo de nuevo.";
     });
   });
+
+  applyAboutState();
 })();
 </script>
 </body>

@@ -30,8 +30,12 @@ how single-binary Go projects are deployed behind its nginx reverse proxy.
   environment: `ADDR=127.0.0.1:<port>` and/or `-addr` flag.
 - nginx: `/etc/nginx/sites-available/<vhost>`, symlinked into
   `sites-enabled`, `proxy_pass http://127.0.0.1:<port>` with standard
-  `X-Real-IP` / `X-Forwarded-*` headers; SSE endpoints add
-  `proxy_buffering off`.
+  `X-Real-IP` / `X-Forwarded-*` headers. A long-lived response (an SSE
+  stream) needs `proxy_http_version 1.1` and a read timeout longer than the
+  idle gap; turning buffering off per response with `X-Accel-Buffering: no`
+  in the handler is enough, so the vhost does not need `proxy_buffering
+  off` for the whole site. komikan's vhost has the timeouts and the header
+  does the rest.
 - TLS: `certbot --nginx -d <vhost>` (certbot account already registered;
   auto-renewal configured). Then `systemctl reload nginx`.
 

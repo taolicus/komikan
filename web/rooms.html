@@ -178,15 +178,13 @@
   }
   .share {
     display: flex;
+    flex-direction: column;
     gap: 0.5rem;
-    flex-wrap: wrap;
-    align-items: center;
     width: 100%;
     margin-bottom: 0.8rem;
   }
   .share input {
-    flex: 1 1 14rem;
-    min-width: 0;
+    width: 100%;
     font: inherit;
     font-size: 0.8rem;
     color: var(--muted);
@@ -194,6 +192,10 @@
     border: 1px solid var(--line);
     border-radius: 8px;
     padding: 0.5rem 0.7rem;
+  }
+  .share-actions {
+    display: flex;
+    gap: 0.5rem;
   }
   a.link-button {
     display: inline-block;
@@ -227,8 +229,10 @@
   <section id="room-view" class="hidden">
     <div class="share hidden" id="share">
       <input id="share-url" type="text" readonly aria-label="Enlace de la sala">
-      <button id="share-native">Compartir</button>
-      <button id="copy">Copiar</button>
+      <div class="share-actions">
+        <button id="share-native">Compartir</button>
+        <button id="copy">Copiar</button>
+      </div>
     </div>
     <div class="actions hidden" id="join-row">
       <button id="join">Unirse</button>
